@@ -57,7 +57,7 @@ public class UserControllerTest {
     private UserController userController;
 
     private static final Random RANDOM = new Random();
-    final String authorizationHeader = "authorizationHeader";
+    private static final String AUTHORIZATION_HEADER = "authorizationHeader";
     private static final Long USER_ID = RANDOM.nextLong();
     private static final String TOPIC = "Topic";
     private static final Set<String> TOPICS = Collections.singleton(TOPIC);
@@ -109,7 +109,7 @@ public class UserControllerTest {
         final TopicModel topicModel = new TopicModel(TOPICS);
 
         // Mocking that a Session exists for the given authorizationHeader
-        Mockito.when(sessionService.findByToken(authorizationHeader)).thenReturn(Optional.of(session));
+        Mockito.when(sessionService.findByToken(AUTHORIZATION_HEADER)).thenReturn(Optional.of(session));
 
         // Mocking that the Session's User is user
         Mockito.when(session.getUser()).thenReturn(user);
@@ -118,7 +118,7 @@ public class UserControllerTest {
         final Long differentUserId = USER_ID + 1;
         Mockito.when(user.getId()).thenReturn(differentUserId);
 
-        userController.update(authorizationHeader, USER_ID, topicModel);
+        userController.update(AUTHORIZATION_HEADER, USER_ID, topicModel);
     }
 
     @Test
@@ -126,9 +126,9 @@ public class UserControllerTest {
         final TopicModel topicModel = new TopicModel(TOPICS);
 
         // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
-        mockSession(authorizationHeader);
+        mockSession(AUTHORIZATION_HEADER);
 
-        final ResponseEntity<UserTopicModel> response = userController.update(authorizationHeader, USER_ID, topicModel);
+        final ResponseEntity<UserTopicModel> response = userController.update(AUTHORIZATION_HEADER, USER_ID, topicModel);
 
         // Verifying that user update was attempted
         Mockito.verify(userService).update(USER_ID, topicModel.getTopics());
@@ -141,10 +141,10 @@ public class UserControllerTest {
     }
 
     @Test(expected = BusinessErrorException.class)
-    public void getStories_userIdDoesNotMatchToken_throwsException() {
+    public void getRealTimeStories_userIdDoesNotMatchToken_throwsException() {
 
         // Mocking that a Session exists for the given authorizationHeader
-        Mockito.when(sessionService.findByToken(authorizationHeader)).thenReturn(Optional.of(session));
+        Mockito.when(sessionService.findByToken(AUTHORIZATION_HEADER)).thenReturn(Optional.of(session));
 
         // Mocking that the Session's User is user
         Mockito.when(session.getUser()).thenReturn(user);
@@ -153,19 +153,89 @@ public class UserControllerTest {
         final Long differentUserId = USER_ID + 1;
         Mockito.when(user.getId()).thenReturn(differentUserId);
 
-        userController.getTopStories(authorizationHeader, USER_ID);
+        userController.getRealTimeTopStories(AUTHORIZATION_HEADER, USER_ID);
     }
 
     @Test
-    public void update_userIdMatchesToken_delegateToUserService_topStoryFound_returnsTopStoriesModel() {
+    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_topStoryFound_returnsTopStoriesModel() {
 
         // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
-        mockSession(authorizationHeader);
+        mockSession(AUTHORIZATION_HEADER);
+
+        // Mocking that mockStory is the top story for mockTopic
+        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, mockStory));
+
+        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(AUTHORIZATION_HEADER, USER_ID);
+
+        // Verifying that getRealTimeTopStories was attempted
+        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
+
+        // Verifying that mockStory is the top story for mockTopic
+        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, mockStory)), response.getBody());
+    }
+
+    @Test
+    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_topStoryNotFound_returnsTopStoriesModel() {
+
+        // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
+        mockSession(AUTHORIZATION_HEADER);
+
+        // Mocking that null is the top story for mockTopic
+        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, null));
+
+        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(AUTHORIZATION_HEADER, USER_ID);
+
+        // Verifying that getRealTimeTopStories was attempted
+        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
+
+        // Verifying that mockTopic has no top story
+        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, null)), response.getBody());
+    }
+
+    @Test
+    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_noUserTopic_returnsTopStoriesModel() {
+
+        // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
+        mockSession(AUTHORIZATION_HEADER);
+
+        // Mocking that no top stories are returned
+        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.emptyMap());
+
+        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(AUTHORIZATION_HEADER, USER_ID);
+
+        // Verifying that getRealTimeTopStories was attempted
+        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
+
+        // Verifying that no top stories are returned
+        Assert.assertEquals(new TopStoriesModel(Collections.emptyMap()), response.getBody());
+    }
+
+    @Test(expected = BusinessErrorException.class)
+    public void getTopStories_userIdDoesNotMatchToken_throwsException() {
+
+        // Mocking that a Session exists for the given authorizationHeader
+        Mockito.when(sessionService.findByToken(AUTHORIZATION_HEADER)).thenReturn(Optional.of(session));
+
+        // Mocking that the Session's User is user
+        Mockito.when(session.getUser()).thenReturn(user);
+
+        // Mocking that the User Id is NOT USER_ID
+        final Long differentUserId = USER_ID + 1;
+        Mockito.when(user.getId()).thenReturn(differentUserId);
+
+        userController.getTopStories(AUTHORIZATION_HEADER, USER_ID);
+    }
+
+    @Test
+    public void getTopStories_userIdMatchesToken_delegateToUserService_topStoryFound_returnsTopStoriesModel() {
+
+        // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
+        mockSession(AUTHORIZATION_HEADER);
 
         // Mocking that mockStory is the top story for mockTopic
         Mockito.when(userService.getTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, mockStory));
 
-        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(authorizationHeader, USER_ID);
+        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(AUTHORIZATION_HEADER, USER_ID);
 
         // Verifying that getTopStories was attempted
         Mockito.verify(userService).getTopStories(USER_ID);
@@ -174,41 +244,6 @@ public class UserControllerTest {
         Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, mockStory)), response.getBody());
     }
 
-    @Test
-    public void update_userIdMatchesToken_delegateToUserService_topStoryNotFound_returnsTopStoriesModel() {
-
-        // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
-        mockSession(authorizationHeader);
-
-        // Mocking that null is the top story for mockTopic
-        Mockito.when(userService.getTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, null));
-
-        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(authorizationHeader, USER_ID);
-
-        // Verifying that getTopStories was attempted
-        Mockito.verify(userService).getTopStories(USER_ID);
-
-        // Verifying that mockTopic has no top story
-        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, null)), response.getBody());
-    }
-
-    @Test
-    public void update_userIdMatchesToken_delegateToUserService_noUserTopic_returnsTopStoriesModel() {
-
-        // Mocking that a Session exists for the given authorizationHeader and for the given User and USER_ID
-        mockSession(authorizationHeader);
-
-        // Mocking that no top stories are returned
-        Mockito.when(userService.getTopStories(USER_ID)).thenReturn(Collections.emptyMap());
-
-        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(authorizationHeader, USER_ID);
-
-        // Verifying that getTopStories was attempted
-        Mockito.verify(userService).getTopStories(USER_ID);
-
-        // Verifying that no top stories are returned
-        Assert.assertEquals(new TopStoriesModel(Collections.emptyMap()), response.getBody());
-    }
 
     private void mockSession(final String authorizationHeader) {
         // Mocking that a Session exists for the given authorizationHeader

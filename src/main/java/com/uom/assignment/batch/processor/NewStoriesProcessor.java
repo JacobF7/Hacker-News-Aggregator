@@ -40,6 +40,11 @@ public class NewStoriesProcessor implements ItemProcessor<StoryIdModel, ItemResp
 
         final ItemResponse itemResponse = (ItemResponse) hackerNewsApiService.doGet(request);
 
+        // TODO test and make sexy
+        if(itemResponse == null) {
+            return null;
+        }
+
         // If the URL is null, set the Response URL to DEFAULT_URL (only occurs for "Ask Hacker News" Stories)
         if(itemResponse.getUrl() == null) {
             itemResponse.setUrl(DEFAULT_URL + itemResponse.getId());

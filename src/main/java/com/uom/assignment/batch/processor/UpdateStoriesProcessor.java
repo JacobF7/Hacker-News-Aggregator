@@ -42,6 +42,11 @@ public class UpdateStoriesProcessor implements ItemProcessor<Story, UpdateStoryM
 
         final ItemResponse itemResponse = (ItemResponse) hackerNewsApiService.doGet(request);
 
+        // TODO TEST AND MAKE SEXY
+        if(itemResponse == null) {
+            return null;
+        }
+
         // Do not process any story that is NOT updated, i.e it is NOT deleted and the score has NOT changed
         if (!itemResponse.isDeleted() && Objects.equals(story.getScore(), itemResponse.getScore())) {
             LOG.info("The Story {} has not not been updated", hackerNewsId);

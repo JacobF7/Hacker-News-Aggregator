@@ -3,6 +3,7 @@ package com.uom.assignment.hacker.news.api.service;
 import com.uom.assignment.hacker.news.api.core.ResponseContentType;
 import com.uom.assignment.hacker.news.api.request.HackerNewsRequest;
 import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
+import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +43,11 @@ public class HackerNewsApiServiceImpl implements HackerNewsApiService {
         bufferedReader.close();
         connection.disconnect();
 
+        // TODO USE OPTIONAL HERE! and Test
+        if(Objects.equals(response, "null")) {
+            return null;
+        }
+
         // produce response
         switch (request.getResponseContentType()) {
 
@@ -54,6 +61,4 @@ public class HackerNewsApiServiceImpl implements HackerNewsApiService {
                 throw new UnsupportedOperationException(String.format("Response Content Type [%s] is not supported", request.getResponseContentType()));
         }
     }
-
-    // TODO RETURNING NULL HACKERNEWS
 }

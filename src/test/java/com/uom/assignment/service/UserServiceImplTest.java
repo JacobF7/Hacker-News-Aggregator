@@ -135,16 +135,16 @@ public class UserServiceImplTest {
     }
 
     @Test(expected = BusinessErrorException.class)
-    public void getTopStories_userIdDoesNotExist_throwsException() {
+    public void getRealTimeTopStories_userIdDoesNotExist_throwsException() {
 
         // Mocking that no User exists with USER_ID
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(null);
 
-        userService.getTopStories(USER_ID);
+        userService.getRealTimeTopStories(USER_ID);
     }
 
     @Test
-    public void getTopStories_userIdExists_returnsTopicTopStory() {
+    public void getRealTimeTopStories_userIdExists_returnsTopicTopStory() {
 
         // Mocking that mockUser exists with USER_ID
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
@@ -167,14 +167,14 @@ public class UserServiceImplTest {
         // Mocking that findTopStoryByTitleContaining for mockTopic returns mockStory
         Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.of(mockStory));
 
-        final Map<Topic, Story> topStories = userService.getTopStories(USER_ID);
+        final Map<Topic, Story> topStories = userService.getRealTimeTopStories(USER_ID);
 
         // Verifying that the top story for mockTopic is mockStory
         Assert.assertEquals(Collections.singletonMap(mockTopic, mockStory), topStories);
     }
 
     @Test
-    public void getTopStories_userIdExists_userTopicIneffective_returnsEmptyMap() {
+    public void getRealTimeTopStories_userIdExists_userTopicIneffective_returnsEmptyMap() {
 
         // Mocking that mockUser exists with USER_ID
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
@@ -185,14 +185,14 @@ public class UserServiceImplTest {
         // Mocking that mockUserTopic is ineffective
         Mockito.when(mockUserTopic.isEffective()).thenReturn(false);
 
-        final Map<Topic, Story> topStories = userService.getTopStories(USER_ID);
+        final Map<Topic, Story> topStories = userService.getRealTimeTopStories(USER_ID);
 
         // Verifying that an empty map is returned
         Assert.assertEquals(Collections.emptyMap(), topStories);
     }
 
     @Test
-    public void getTopStories_userIdExists_noTopStoryExists_returnsNullTopStory() {
+    public void getRealTimeTopStories_userIdExists_noTopStoryExists_returnsNullTopStory() {
 
         // Mocking that mockUser exists with USER_ID
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
@@ -215,10 +215,48 @@ public class UserServiceImplTest {
         // Mocking that findTopStoryByTitleContaining for mockTopic returns no story
         Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.empty());
 
-        final Map<Topic, Story> topStories = userService.getTopStories(USER_ID);
+        final Map<Topic, Story> topStories = userService.getRealTimeTopStories(USER_ID);
 
         // Verifying that the top story for mockTopic is mockStory
         Assert.assertEquals(Collections.singletonMap(mockTopic, null), topStories);
     }
 
+    @Test(expected = BusinessErrorException.class)
+    public void getTopStories_userIdDoesNotExist_throwsException() {
+
+        // Mocking that no User exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(null);
+
+        userService.getTopStories(USER_ID);
+    }
+
+    @Test
+    public void getTopStories_returnsTopicTopStory() {
+
+        // Mocking that mockUser exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
+
+        // Mocking that mockUser is subscribed to mockUserTopic
+        Mockito.when(mockUser.getUserTopics()).thenReturn(Collections.singleton(mockUserTopic));
+
+        // Mocking that mockUserTopic is effective
+        Mockito.when(mockUserTopic.isEffective()).thenReturn(true);
+
+        // Mocking that mockUserTopic contains mockUser
+        Mockito.when(mockUserTopic.getUser()).thenReturn(mockUser);
+
+        // Mocking that mockUserTopic contains mockTopic
+        Mockito.when(mockUserTopic.getTopic()).thenReturn(mockTopic);
+
+        // Mocking that mockTopic has name TOPIC
+        Mockito.when(mockTopic.getName()).thenReturn(TOPIC);
+
+        // Mocking that the top story for mockTopic is mockTopic
+        Mockito.when(mockTopic.getTopStory()).thenReturn(mockStory);
+
+        final Map<Topic, Story> topStories = userService.getTopStories(USER_ID);
+
+        // Verifying that the top story for mockTopic is mockStory
+        Assert.assertEquals(Collections.singletonMap(mockTopic, mockStory), topStories);
+    }
 }

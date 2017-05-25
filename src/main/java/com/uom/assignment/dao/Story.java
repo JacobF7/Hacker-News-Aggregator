@@ -1,6 +1,8 @@
 package com.uom.assignment.dao;
 
 
+import com.google.common.base.MoreObjects;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
@@ -140,5 +142,19 @@ public class Story {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getHackerNewsId(), getTitle(), getAuthor(), getUrl(), getScore(), isDeleted(), getLastUpdated());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("hackerNewsId", hackerNewsId)
+                .add("title", title)
+                .add("author", author)
+                .add("url", url)
+                .add("score", score)
+                .add("deleted", deleted)
+                .add("lastUpdated", lastUpdated)
+                .toString();
     }
 }

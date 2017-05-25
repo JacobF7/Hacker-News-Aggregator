@@ -36,6 +36,8 @@ public class NewStoriesReader implements ItemReader<StoryIdModel> {
         // Get all the New Stories from Hacker News API
         final NewStoriesResponse newStoriesResponse = ((NewStoriesResponse) hackerNewsApiService.doGet(new NewStoriesRequest()));
 
+        // TODO WHAT IF THIS IS NULL, TEST AND ETC..
+
         newStories = Arrays.stream(newStoriesResponse.getItems()).map(StoryIdModel::new).collect(Collectors.toList());
     }
 

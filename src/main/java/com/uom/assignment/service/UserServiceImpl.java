@@ -84,6 +84,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Map<Topic, Story> getRealTimeTopStories(final Long id) {
+
+        final User user = Optional.ofNullable(userRepository.findOne(id))
+                .orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_USER));
+
+        return user.getUserTopics()
+                .stream()
+                .filter(UserTopic::isEffective)
+                .map(UserTopic::getTopic)
+                .collect(HashMap::new, (topStories, topic)-> topStories.put(topic, storyService.findTopStoryByTitleContaining(topic.getName()).orElse(null)), HashMap::putAll);
+    }
+
+    @Override
     public Map<Topic, Story> getTopStories(final Long id) {
 
         final User user = Optional.ofNullable(userRepository.findOne(id))
@@ -93,7 +106,7 @@ public class UserServiceImpl implements UserService {
                    .stream()
                    .filter(UserTopic::isEffective)
                    .map(UserTopic::getTopic)
-                   .collect(HashMap::new, (topStories, topic)-> topStories.put(topic, storyService.findTopStoryByTitleContaining(topic.getName()).orElse(null)), HashMap::putAll);
+                   .collect(HashMap::new, (topStories, topic)-> topStories.put(topic, topic.getTopStory()), HashMap::putAll);
     }
 }
 

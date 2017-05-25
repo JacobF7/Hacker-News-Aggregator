@@ -46,11 +46,22 @@ public interface UserService {
     void update(Long id, Set<String> topics);
 
     /**
-     * For each effective {@link Topic} that the {@link User} is subscribed to, find the top {@link Story} associated to that {@link Topic}.
+     * For each effective {@link Topic} that the {@link User} is subscribed to, determine the top {@link Story} associated to that {@link Topic}.
      * Note that a top {@link Story} cannot be {@link Story#deleted}.
      *
      * @param id the {@link User#id} of the {@link User} for which every top {@link Story} is to be retrieved.
      * @return a {@link Map} containing the top {@link Story} for each effective {@link Topic} that the {@link User} is subscribed to.
+     * @throws BusinessErrorException when the specified {@code id} does not belong to any {@link User}.
+     */
+    Map<Topic, Story> getRealTimeTopStories(Long id);
+
+
+    /**
+     * For each effective {@link Topic} that the {@link User} is subscribed to, retrieve the {@link Topic#topStory} associated to that {@link Topic}.
+     * Note that a top {@link Story} cannot be {@link Story#deleted}.
+     *
+     * @param id the {@link User#id} of the {@link User} for which every top {@link Story} is to be retrieved.
+     * @return a {@link Map} containing the the {@link Topic#topStory}  for each effective {@link Topic} that the {@link User} is subscribed to.
      * @throws BusinessErrorException when the specified {@code id} does not belong to any {@link User}.
      */
     Map<Topic, Story> getTopStories(Long id);

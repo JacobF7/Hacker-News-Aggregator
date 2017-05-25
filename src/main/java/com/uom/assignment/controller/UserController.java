@@ -63,6 +63,23 @@ public class UserController {
         return ResponseEntity.ok(new UserTopicModel(id, topicModel.getTopics()));
     }
 
+    @RequestMapping(value ="/{id}/real-time-stories", method = RequestMethod.GET)
+    public ResponseEntity<TopStoriesModel> getRealTimeTopStories(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization,
+                                                                 @PathVariable final Long id) {
+
+        // Should NOT occur, due to Authentication Aspect
+        final Session session = sessionService.findByToken(authorization).orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_TOKEN));
+
+        // Make sure that the userId matches the id of the user obtained from the session
+        if(!Objects.equals(id, session.getUser().getId())) {
+            throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
+        }
+
+        final Map<Topic, Story> topStories = userService.getRealTimeTopStories(id);
+        final TopStoriesModel topStoriesModel = new TopStoriesModel(topStories);
+        return ResponseEntity.ok(topStoriesModel);
+    }
+
     @RequestMapping(value ="/{id}/stories", method = RequestMethod.GET)
     public ResponseEntity<TopStoriesModel> getTopStories(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization,
                                                          @PathVariable final Long id) {

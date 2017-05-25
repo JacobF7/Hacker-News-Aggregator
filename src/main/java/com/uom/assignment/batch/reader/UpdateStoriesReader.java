@@ -27,10 +27,9 @@ public class UpdateStoriesReader implements ItemReader<Story> {
     private static final Logger LOG = LoggerFactory.getLogger(UpdateStoriesReader.class);
     private final List<Story> stories;
 
-    //TODO GET FETCH MODE NICELY
     @Autowired
     public UpdateStoriesReader(final StoryService storyService,
-                               @Value("#{jobParameters['FETCH_MODE']}") final FetchMode fetchMode,
+                               @Value("#{jobParameters[T(com.uom.assignment.batch.reader.FetchMode).FETCH_MODE]}") final FetchMode fetchMode,
                                @Value("${recent.update.duration.hours}") int duration) {
 
         LOG.info("Reading [{}] Stories from Database", fetchMode);

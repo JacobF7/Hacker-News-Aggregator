@@ -21,7 +21,7 @@ import java.io.IOException;
 public class NewStoriesProcessor implements ItemProcessor<StoryIdModel, ItemResponse> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NewStoriesProcessor.class);
-    private static final String DEFAULT_URL = "https://news.ycombinator.com/item?id=";
+    static final String DEFAULT_URL = "https://news.ycombinator.com/item?id=";
 
     private final HackerNewsApiService hackerNewsApiService;
 

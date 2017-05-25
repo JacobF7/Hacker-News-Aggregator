@@ -42,7 +42,7 @@ public class UpdateStoriesScheduledTaskTest {
         final JobParameters jobParameters = argumentCaptor.getValue();
 
         // Verifying that the job was run on ALL fetch mode
-        Assert.assertEquals(FetchMode.ALL.name(), jobParameters.getParameters().get(UpdateStoriesScheduledTask.FETCH_MODE).getValue());
+        Assert.assertEquals(FetchMode.ALL.name(), jobParameters.getParameters().get(FetchMode.FETCH_MODE).getValue());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class UpdateStoriesScheduledTaskTest {
         final JobParameters jobParameters = argumentCaptor.getValue();
 
         // Verifying that the job was run on RECENT fetch mode
-        Assert.assertEquals(FetchMode.RECENT.name(), jobParameters.getParameters().get(UpdateStoriesScheduledTask.FETCH_MODE).getValue());
+        Assert.assertEquals(FetchMode.RECENT.name(), jobParameters.getParameters().get(FetchMode.FETCH_MODE).getValue());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class UpdateStoriesScheduledTaskTest {
         final JobParameters jobParameters = argumentCaptor.getValue();
 
         // Verifying that the job was run on ALL fetch mode
-        Assert.assertEquals(FetchMode.ALL.name(), jobParameters.getParameters().get(UpdateStoriesScheduledTask.FETCH_MODE).getValue());
+        Assert.assertEquals(FetchMode.ALL.name(), jobParameters.getParameters().get(FetchMode.FETCH_MODE).getValue());
     }
 
 }

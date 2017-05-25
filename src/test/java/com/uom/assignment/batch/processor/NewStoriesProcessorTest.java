@@ -74,13 +74,16 @@ public class NewStoriesProcessorTest {
         // Mocking that the URL is not set, i.e. it is null
         Mockito.when(mockItemResponse.getUrl()).thenReturn(null);
 
+        // Mocking that the id for mockItemResponse is STORY_ID
+        Mockito.when(mockItemResponse.getId()).thenReturn(Long.valueOf(STORY_ID));
+
         final ItemResponse itemResponse = newStoriesProcessor.process(mockStoryIdModel);
 
         // Verifying that the request was made
         Mockito.verify(hackerNewsApiService).doGet(request);
 
-        // Verifying that the mockItemResponse url is set to the request endpoint url
-        Mockito.verify(mockItemResponse).setUrl(request.getEndpoint());
+        // Verifying that the mockItemResponse url is set to the default url
+        Mockito.verify(mockItemResponse).setUrl(NewStoriesProcessor.DEFAULT_URL + STORY_ID);
 
         // Verifying that the processor returned mockItemResponse
         Assert.assertEquals(mockItemResponse, itemResponse);

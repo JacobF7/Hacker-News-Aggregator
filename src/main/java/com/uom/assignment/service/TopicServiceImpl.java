@@ -48,11 +48,8 @@ public class TopicServiceImpl implements TopicService {
         // Note that topics are trimmed and converted to lowercase.
         final String sanitizedTopic = TopicService.sanitize(topic);
 
-        // find the top story for the given topic
-        final Story topStory = storyService.findTopStoryByTitleContaining(sanitizedTopic).orElse(null);
-
         // If a topic already exists, fetch it, otherwise create a new one.
-        return this.findByName(sanitizedTopic).orElseGet(() -> topicRepository.save(new Topic(sanitizedTopic, topStory)));
+        return this.findByName(sanitizedTopic).orElseGet(() -> topicRepository.save(new Topic(sanitizedTopic, storyService.findTopStoryByTitleContaining(sanitizedTopic).orElse(null))));
     }
 
     @Override

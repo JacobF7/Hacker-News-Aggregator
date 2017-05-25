@@ -9,6 +9,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,17 +19,17 @@ import java.util.List;
  */
 @Component
 @StepScope
-public class UpdateTopicsReader implements ItemReader<Topic> {
+public class UpdateTopStoriesReader implements ItemReader<Topic> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateTopicsReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateTopStoriesReader.class);
     private final List<Topic> topics;
 
     @Autowired
-    public UpdateTopicsReader(final TopicService topicService) {
+    public UpdateTopStoriesReader(final TopicService topicService) {
         LOG.info("Reading Topics from Database");
 
         // Get all the Topics from Database
-        this.topics = topicService.findAll();
+        this.topics = new ArrayList<>(topicService.findAll());
     }
 
     @Override

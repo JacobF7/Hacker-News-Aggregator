@@ -34,9 +34,6 @@ public class Story {
     @Column(name = "last_updated")
     private Long lastUpdated;
 
-    @OneToMany
-    private Set<Topic> topics;
-
     public Story() {
         // Needed by Hibernate
     }
@@ -116,14 +113,6 @@ public class Story {
 
     public void setLastUpdated(final Long lastUpdated) {
         this.lastUpdated = lastUpdated;
-    }
-
-    public Set<Topic> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(final Set<Topic> topics) {
-        this.topics = topics;
     }
 
     @Override

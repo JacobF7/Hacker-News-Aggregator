@@ -1,7 +1,10 @@
 package com.uom.assignment.batch.job;
 
+import com.uom.assignment.batch.step.NewStoriesStep;
 import com.uom.assignment.batch.step.UpdateStoriesStep;
+import com.uom.assignment.batch.step.UpdateTopStoriesStep;
 import com.uom.assignment.dao.Story;
+import com.uom.assignment.dao.Topic;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -12,10 +15,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * The {@link Configuration} for the Update Stories Job, which is responsible for updating every persisted {@link Story}.
- * Note that a {@link Story} can only be updated if it is not {@link Story#deleted}.
+ * The {@link Configuration} for the Stories Job, which is responsible for:
+ *      a) Updating every persisted {@link Story}, since the {@link Story#score} and {@link Story#deleted} may have changed.
+ *      b) Retrieving a batch of new Stories and persisting every new {@link Story}.
+ *      c) Updating every persisted {@link Topic}, since the {@link Topic#topStory} may have changed.
  *
- * Created by jacobfalzon on 21/05/2017.
+ * Created by jacobfalzon on 24/05/2017.
  */
 @Configuration
 public class UpdateStoriesJob {
@@ -31,11 +36,17 @@ public class UpdateStoriesJob {
 
     @Bean(name = UpdateStoriesJob.JOB_NAME)
     @Autowired
-    public Job jobNewStories(@Qualifier(UpdateStoriesStep.STEP_NAME) final Step step) {
+    public Job jobNewStories(@Qualifier(UpdateStoriesStep.STEP_NAME) final Step updateStoriesStep,
+                             @Qualifier(NewStoriesStep.STEP_NAME) final Step newStoriesStep,
+                             @Qualifier(UpdateTopStoriesStep.STEP_NAME) final Step updateTopicsStep) {
+
         return jobBuilderFactory.get(JOB_NAME)
                 .incrementer(new RunIdIncrementer())
-                .flow(step)
+                .flow(updateStoriesStep)
+                .next(newStoriesStep)
+                .next(updateTopicsStep)
                 .end()
                 .build();
     }
+
 }

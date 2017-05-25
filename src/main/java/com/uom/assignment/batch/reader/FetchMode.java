@@ -17,5 +17,8 @@ public enum FetchMode {
     /**
      * Retrieves all recently updated stories
      */
-    RECENT
+    RECENT;
+
+
+    public static final String FETCH_MODE = "FETCH_MODE";
 }

@@ -1,6 +1,7 @@
 package com.uom.assignment.batch.reader;
 
 import com.uom.assignment.hacker.news.api.request.NewStoriesRequest;
+import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.NewStoriesResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.StoryIdModel;
@@ -24,6 +25,22 @@ public class NewStoriesReaderTest {
 
     private static final String NEW_STORY_ID = "1234";
     private static final NewStoriesResponse NEW_STORIES_RESPONSE = new NewStoriesResponse(new String[] {NEW_STORY_ID});
+    private static final EmptyResponse EMPTY_RESPONSE = new EmptyResponse();
+
+    @Test
+    public void read_emptyResponse_returnsStoryIdModel() throws Exception {
+
+        // Mocking that EMPTY_RESPONSE is returned, i.e. the empty response
+        Mockito.when(hackerNewsApiService.doGet(new NewStoriesRequest())).thenReturn(EMPTY_RESPONSE);
+
+        final StoryIdModel storyIdModel = new NewStoriesReader(hackerNewsApiService).read();
+
+        // Verifying that the request was made
+        Mockito.verify(hackerNewsApiService).doGet(new NewStoriesRequest());
+
+        // Verifying that the reader returned null
+        Assert.assertNull(storyIdModel);
+    }
 
     @Test
     public void read_newStoriesNotEmpty_returnsStoryIdModel() throws Exception {
@@ -43,7 +60,7 @@ public class NewStoriesReaderTest {
     @Test
     public void read_newStoriesEmpty_returnsNull() throws Exception {
 
-        // Mocking that an empty response is returned
+        // Mocking that a response is returned containing an empty array
         Mockito.when(hackerNewsApiService.doGet(new NewStoriesRequest())).thenReturn(new NewStoriesResponse(new String[]{}));
 
         final StoryIdModel storyIdModel = new NewStoriesReader(hackerNewsApiService).read();

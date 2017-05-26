@@ -2,6 +2,7 @@ package com.uom.assignment.batch.processor;
 
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.hacker.news.api.request.ItemRequest;
+import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.UpdateStoryModel;
@@ -45,13 +46,29 @@ public class UpdateStoriesProcessorTest {
 
         // Mocking mockStory to contain OLD_SCORE
         Mockito.when(mockStory.getScore()).thenReturn(OLD_SCORE);
-
-        // Mocking that mockItemResponse is returned
-        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(HACKER_NEWS_ID))).thenReturn(mockItemResponse);
     }
 
     @Test
+    public void process_emptyResponse_returnsNull() throws Exception {
+
+        // Mocking that empty response is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(HACKER_NEWS_ID))).thenReturn(new EmptyResponse());
+
+        final UpdateStoryModel updateStoryModel = updateStoriesProcessor.process(mockStory);
+
+        // Verifying that the request was made
+        Mockito.verify(hackerNewsApiService).doGet(new ItemRequest(mockStory.getHackerNewsId()));
+
+        // Verifying that the processor returned null
+        Assert.assertNull(updateStoryModel);
+    }
+
+
+    @Test
     public void process_storyNotDeleted_storyScoreChanged_returnsUpdateStoryModel() throws Exception {
+
+        // Mocking that mockItemResponse is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(HACKER_NEWS_ID))).thenReturn(mockItemResponse);
 
         // Mocking that the story is NOT deleted
         Mockito.when(mockItemResponse.isDeleted()).thenReturn(false);
@@ -71,6 +88,9 @@ public class UpdateStoriesProcessorTest {
     @Test
     public void process_storyDeleted_returnsUpdateStoryModel() throws Exception {
 
+        // Mocking that mockItemResponse is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(HACKER_NEWS_ID))).thenReturn(mockItemResponse);
+
         // Mocking that the story is deleted
         Mockito.when(mockItemResponse.isDeleted()).thenReturn(true);
 
@@ -88,6 +108,9 @@ public class UpdateStoriesProcessorTest {
 
     @Test
     public void process_storyNotDeleted_storyScoreNotChanged_returnsNull() throws Exception {
+
+        // Mocking that mockItemResponse is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(HACKER_NEWS_ID))).thenReturn(mockItemResponse);
 
         // Mocking that the story is NOT deleted
         Mockito.when(mockItemResponse.isDeleted()).thenReturn(false);

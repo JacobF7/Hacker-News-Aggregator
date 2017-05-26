@@ -2,6 +2,7 @@ package com.uom.assignment.batch.processor;
 
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.hacker.news.api.request.ItemRequest;
+import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.UpdateStoryModel;
@@ -34,18 +35,20 @@ public class UpdateStoriesProcessor implements ItemProcessor<Story, UpdateStoryM
     @Override
     public UpdateStoryModel process(final Story story) throws IOException {
 
-        LOG.info("Calling Hacker News API: [{}]", ItemRequest.class);
+        LOG.info("Calling Hacker News API: [{}] for Story: {}", ItemRequest.class.getSimpleName(), story.getHackerNewsId());
 
         // Retrieve the details of the story from Hacker News API
         final Long hackerNewsId = story.getHackerNewsId();
         final ItemRequest request = new ItemRequest(hackerNewsId);
 
-        final ItemResponse itemResponse = (ItemResponse) hackerNewsApiService.doGet(request);
+        final HackerNewsResponse response = hackerNewsApiService.doGet(request);
 
-        // TODO TEST AND MAKE SEXY
-        if(itemResponse == null) {
+        if(response.isEmpty()) { // If the response is empty, do not process the item
+            LOG.info("Received empty response from Hacker News API: [{}] for Story: {}", ItemRequest.class.getSimpleName(), story.getHackerNewsId());
             return null;
         }
+
+        final ItemResponse itemResponse = (ItemResponse) response;
 
         // Do not process any story that is NOT updated, i.e it is NOT deleted and the score has NOT changed
         if (!itemResponse.isDeleted() && Objects.equals(story.getScore(), itemResponse.getScore())) {

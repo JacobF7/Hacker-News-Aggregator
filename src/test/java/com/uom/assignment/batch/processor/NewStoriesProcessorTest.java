@@ -1,6 +1,7 @@
 package com.uom.assignment.batch.processor;
 
 import com.uom.assignment.hacker.news.api.request.ItemRequest;
+import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.StoryIdModel;
@@ -35,6 +36,24 @@ public class NewStoriesProcessorTest {
 
     private static final String STORY_ID = "1234";
     private static final String URL = "url";
+
+    @Test
+    public void process_emptyResponse_returnsNull() throws Exception  {
+
+        // Mocking mockStoryIdModel to contain STORY_ID
+        Mockito.when(mockStoryIdModel.getId()).thenReturn(STORY_ID);
+
+        // Mocking that empty response is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(Long.valueOf(mockStoryIdModel.getId())))).thenReturn(new EmptyResponse());
+
+        final ItemResponse response = newStoriesProcessor.process(mockStoryIdModel);
+
+        // Verifying that the request was made
+        Mockito.verify(hackerNewsApiService).doGet(new ItemRequest(Long.valueOf(mockStoryIdModel.getId())));
+
+        // Verifying that the processor returned null
+        Assert.assertNull(response);
+    }
 
     @Test
     public void process_responseUrlSet_returnsItemResponse() throws Exception  {

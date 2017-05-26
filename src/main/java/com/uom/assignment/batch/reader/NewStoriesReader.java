@@ -1,6 +1,7 @@
 package com.uom.assignment.batch.reader;
 
 import com.uom.assignment.hacker.news.api.request.NewStoriesRequest;
+import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
 import com.uom.assignment.hacker.news.api.response.NewStoriesResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.StoryIdModel;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,14 +33,18 @@ public class NewStoriesReader implements ItemReader<StoryIdModel> {
 
     @Autowired
     public NewStoriesReader(final HackerNewsApiService hackerNewsApiService) throws IOException {
-        LOG.info("Calling Hacker News API: [{}]", NewStoriesRequest.class);
+        LOG.info("Calling Hacker News API: [{}]", NewStoriesRequest.class.getSimpleName());
 
         // Get all the New Stories from Hacker News API
-        final NewStoriesResponse newStoriesResponse = ((NewStoriesResponse) hackerNewsApiService.doGet(new NewStoriesRequest()));
+        final HackerNewsResponse response = hackerNewsApiService.doGet(new NewStoriesRequest());
 
-        // TODO WHAT IF THIS IS NULL, TEST AND ETC..
-
-        newStories = Arrays.stream(newStoriesResponse.getItems()).map(StoryIdModel::new).collect(Collectors.toList());
+        if(response.isEmpty()) { // If the response is empty, we assume that no stories are received
+            LOG.info("Received empty response from Hacker News API : [{}]", NewStoriesRequest.class.getSimpleName());
+            newStories = new ArrayList<>();
+        } else {
+            final NewStoriesResponse newStoriesResponse = (NewStoriesResponse) response;
+            newStories = Arrays.stream(newStoriesResponse.getItems()).map(StoryIdModel::new).collect(Collectors.toList());
+        }
     }
 
     @Override

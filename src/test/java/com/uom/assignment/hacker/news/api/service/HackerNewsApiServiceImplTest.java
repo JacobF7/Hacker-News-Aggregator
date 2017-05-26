@@ -2,6 +2,7 @@ package com.uom.assignment.hacker.news.api.service;
 
 import com.uom.assignment.hacker.news.api.request.ItemRequest;
 import com.uom.assignment.hacker.news.api.request.NewStoriesRequest;
+import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import com.uom.assignment.hacker.news.api.response.NewStoriesResponse;
@@ -23,6 +24,7 @@ public class HackerNewsApiServiceImplTest {
     private HackerNewsApiServiceImpl hackerNewsApiService;
 
     private static final Long ITEM_ID = 1L;
+    private static final Long INVALID_ITEM_ID = -1L;
 
     @Test
     public void doGet_newStoriesRequest_returnsNewStoriesResponse() throws Exception {
@@ -38,6 +40,14 @@ public class HackerNewsApiServiceImplTest {
 
         Assert.assertNotNull(hackerNewsResponse);
         Assert.assertEquals(ItemResponse.class, hackerNewsResponse.getClass());
+    }
+
+    @Test
+    public void doGet_itemRequest_invalidRequest_returnEmptyResponse() throws Exception {
+        final HackerNewsResponse hackerNewsResponse = hackerNewsApiService.doGet(new ItemRequest(INVALID_ITEM_ID));
+
+        Assert.assertNotNull(hackerNewsResponse);
+        Assert.assertEquals(EmptyResponse.class, hackerNewsResponse.getClass());
     }
 
 }

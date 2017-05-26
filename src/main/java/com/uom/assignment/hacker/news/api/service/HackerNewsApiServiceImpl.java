@@ -2,6 +2,8 @@ package com.uom.assignment.hacker.news.api.service;
 
 import com.uom.assignment.hacker.news.api.core.ResponseContentType;
 import com.uom.assignment.hacker.news.api.request.HackerNewsRequest;
+import com.uom.assignment.hacker.news.api.request.ItemRequest;
+import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -43,9 +45,9 @@ public class HackerNewsApiServiceImpl implements HackerNewsApiService {
         bufferedReader.close();
         connection.disconnect();
 
-        // TODO USE OPTIONAL HERE! and Test
-        if(Objects.equals(response, "null")) {
-            return null;
+        // If Hacker News sent an empty response, we send an empty response
+        if(EmptyResponse.isEmptyResponse(response)) {
+            return new EmptyResponse();
         }
 
         // produce response
@@ -59,6 +61,17 @@ public class HackerNewsApiServiceImpl implements HackerNewsApiService {
 
             default:
                 throw new UnsupportedOperationException(String.format("Response Content Type [%s] is not supported", request.getResponseContentType()));
+        }
+    }
+
+    public static void main(String[] args) {
+        HackerNewsApiServiceImpl h = new HackerNewsApiServiceImpl();
+
+        try {
+            final ItemResponse hackerNewsResponse = (ItemResponse) h.doGet(new ItemRequest(14417340L));
+            System.out.println(hackerNewsResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.uom.assignment.batch.processor;
 
 import com.uom.assignment.hacker.news.api.request.ItemRequest;
+import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
 import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import com.uom.assignment.hacker.news.api.service.HackerNewsApiService;
 import com.uom.assignment.model.request.StoryIdModel;
@@ -33,17 +34,19 @@ public class NewStoriesProcessor implements ItemProcessor<StoryIdModel, ItemResp
     @Override
     public ItemResponse process(final StoryIdModel storyIdModel) throws IOException {
 
-        LOG.info("Calling Hacker News API: [{}]", ItemRequest.class);
+        LOG.info("Calling Hacker News API: [{}] for Story: {}", ItemRequest.class.getSimpleName(), storyIdModel.getId());
 
         // Retrieve the details of the story from Hacker News API
         final ItemRequest request = new ItemRequest(Long.valueOf(storyIdModel.getId()));
 
-        final ItemResponse itemResponse = (ItemResponse) hackerNewsApiService.doGet(request);
+        final HackerNewsResponse response = hackerNewsApiService.doGet(request);
 
-        // TODO test and make sexy
-        if(itemResponse == null) {
+        if(response.isEmpty()) { // If the response is empty, do not process the item
+            LOG.info("Received empty response from Hacker News API: [{}] for Story: {}", ItemRequest.class.getSimpleName(), storyIdModel.getId());
             return null;
         }
+
+        final ItemResponse itemResponse = (ItemResponse) response;
 
         // If the URL is null, set the Response URL to DEFAULT_URL (only occurs for "Ask Hacker News" Stories)
         if(itemResponse.getUrl() == null) {

@@ -7,4 +7,12 @@ package com.uom.assignment.hacker.news.api.response;
  */
 public interface HackerNewsResponse {
 
+    /**
+     * Should return true if the response is empty, false otherwise.
+     *
+     * @return false, since by default a response is not empty.
+     */
+    default Boolean isEmpty() {
+        return false;
+    }
 }

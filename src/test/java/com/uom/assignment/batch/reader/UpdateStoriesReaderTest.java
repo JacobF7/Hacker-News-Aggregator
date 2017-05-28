@@ -41,7 +41,7 @@ public class UpdateStoriesReaderTest {
         Mockito.verify(storyService).findAllActive();
 
         // Verifying that no request to fetch RECENT stories was made
-        Mockito.verify(storyService, Mockito.never()).findActiveByDuration(Duration.ofHours(DURATION));
+        Mockito.verify(storyService, Mockito.never()).findActiveByLastUpdatedDuration(Duration.ofHours(DURATION));
 
         // Verifying that the reader returned mockStory
         Assert.assertEquals(mockStory, story);
@@ -51,12 +51,12 @@ public class UpdateStoriesReaderTest {
     public void read_RECENT_storyExists_returnsStory() throws Exception {
 
         // Mocking that mockStory is the only recent story
-        Mockito.when(storyService.findActiveByDuration(Duration.ofHours(DURATION))).thenReturn(Collections.singletonList(mockStory));
+        Mockito.when(storyService.findActiveByLastUpdatedDuration(Duration.ofHours(DURATION))).thenReturn(Collections.singletonList(mockStory));
 
         final Story story = new UpdateStoriesReader(storyService, FetchMode.RECENT, DURATION).read();
 
         // Verifying that a request to fetch RECENT stories was made
-        Mockito.verify(storyService).findActiveByDuration(Duration.ofHours(DURATION));
+        Mockito.verify(storyService).findActiveByLastUpdatedDuration(Duration.ofHours(DURATION));
 
         // Verifying that no request to fetch ALL stories was made
         Mockito.verify(storyService, Mockito.never()).findAllActive();
@@ -77,7 +77,7 @@ public class UpdateStoriesReaderTest {
         Mockito.verify(storyService).findAllActive();
 
         // Verifying that no request to fetch RECENT stories was made
-        Mockito.verify(storyService, Mockito.never()).findActiveByDuration(Duration.ofHours(DURATION));
+        Mockito.verify(storyService, Mockito.never()).findActiveByLastUpdatedDuration(Duration.ofHours(DURATION));
 
         // Verifying that the reader returned null
         Assert.assertNull(story);

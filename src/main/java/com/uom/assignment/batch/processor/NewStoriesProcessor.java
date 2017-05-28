@@ -48,6 +48,11 @@ public class NewStoriesProcessor implements ItemProcessor<StoryIdModel, ItemResp
 
         final ItemResponse itemResponse = (ItemResponse) response;
 
+        if(itemResponse.isDeleted()) { // If the item has already been deleted, do not process the item
+            LOG.info("The Story {} has not not been updated", storyIdModel.getId());
+            return null;
+        }
+
         // If the URL is null, set the Response URL to DEFAULT_URL (only occurs for "Ask Hacker News" Stories)
         if(itemResponse.getUrl() == null) {
             itemResponse.setUrl(DEFAULT_URL + itemResponse.getId());

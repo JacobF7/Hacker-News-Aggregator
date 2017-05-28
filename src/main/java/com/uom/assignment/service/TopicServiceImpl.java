@@ -62,5 +62,4 @@ public class TopicServiceImpl implements TopicService {
         topic.setTopStory(topStory);
         return topicRepository.save(topic);
     }
-
 }

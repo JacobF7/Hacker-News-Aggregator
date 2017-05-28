@@ -13,6 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.Random;
 
+import static com.uom.assignment.batch.writer.NewStoriesWriter.toEpoch;
+
 /**
  * A test suite for {@link NewStoriesWriter}.
  *
@@ -39,6 +41,7 @@ public class NewStoriesWriterTest {
     private static final String AUTHOR = "author";
     private static final String URL = "url";
     private static final Long SCORE = RANDOM.nextLong();
+    private static final Long CREATION_DATE = RANDOM.nextLong();
 
     @Test
     public void write_persistsStories() {
@@ -49,9 +52,10 @@ public class NewStoriesWriterTest {
         Mockito.when(mockItemResponse.getBy()).thenReturn(AUTHOR);
         Mockito.when(mockItemResponse.getUrl()).thenReturn(URL);
         Mockito.when(mockItemResponse.getScore()).thenReturn(SCORE);
+        Mockito.when(mockItemResponse.getTime()).thenReturn(CREATION_DATE);
 
         // Mocking that mockStory is returned
-        Mockito.when(storyService.createOrUpdate(HACKER_NEWS_ID, TITLE, AUTHOR, URL, SCORE)).thenReturn(mockStory);
+        Mockito.when(storyService.createOrUpdate(HACKER_NEWS_ID, TITLE, AUTHOR, URL, SCORE, toEpoch(CREATION_DATE))).thenReturn(mockStory);
 
         // Mocking that mockStory contains HACKER_NEWS_ID
         Mockito.when(mockStory.getHackerNewsId()).thenReturn(HACKER_NEWS_ID);
@@ -59,6 +63,6 @@ public class NewStoriesWriterTest {
         newStoriesWriter.write(Collections.singletonList(mockItemResponse));
 
         // Verifying that mockStory was returned
-        Mockito.when(storyService.createOrUpdate(HACKER_NEWS_ID, TITLE, AUTHOR, URL, SCORE)).thenReturn(mockStory);
+        Mockito.when(storyService.createOrUpdate(HACKER_NEWS_ID, TITLE, AUTHOR, URL, SCORE, toEpoch(CREATION_DATE))).thenReturn(mockStory);
     }
 }

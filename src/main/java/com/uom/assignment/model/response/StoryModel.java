@@ -9,19 +9,19 @@ import java.util.Objects;
  *
  * Created by jacobfalzon on 21/05/2017.
  */
-public class TopStoryModel {
+public class StoryModel {
 
     private final String title;
     private final String url;
     private final Long score;
 
-    private TopStoryModel() {
+    private StoryModel() {
         this.title = null;
         this.url = null;
         this.score = null;
     }
 
-    private TopStoryModel(final String title, final String url, final Long score) {
+    private StoryModel(final String title, final String url, final Long score) {
         this.title = title;
         this.url =url;
         this.score = score;
@@ -39,13 +39,13 @@ public class TopStoryModel {
         return score;
     }
 
-    public static TopStoryModel of(final Story story) {
+    public static StoryModel of(final Story story) {
 
         if(Objects.isNull(story)) {
-            return new TopStoryModel();
+            return new StoryModel();
         }
 
-        return new TopStoryModel(story.getTitle(), story.getUrl(), story.getScore());
+        return new StoryModel(story.getTitle(), story.getUrl(), story.getScore());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class TopStoryModel {
             return false;
         }
 
-        final TopStoryModel that = (TopStoryModel) o;
+        final StoryModel that = (StoryModel) o;
         return Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getScore(), that.getScore());

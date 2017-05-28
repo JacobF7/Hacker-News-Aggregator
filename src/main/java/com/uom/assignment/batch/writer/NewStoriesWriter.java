@@ -31,8 +31,12 @@ public class NewStoriesWriter implements ItemWriter<ItemResponse> {
     @Override
     public void write(final List<? extends ItemResponse> items) {
         items.stream()
-             .map(item -> storyService.createOrUpdate(item.getId(), item.getTitle(), item.getBy(), item.getUrl(), item.getScore()))
+             .map(item -> storyService.createOrUpdate(item.getId(), item.getTitle(), item.getBy(), item.getUrl(), item.getScore(), toEpoch(item.getTime())))
              .map(Story::getHackerNewsId)
              .forEach(hackerNewsId -> LOG.info("Persisted Item {}", hackerNewsId));
+    }
+
+    static Long toEpoch(final Long unixTime) {
+        return unixTime * 1000L;
     }
 }

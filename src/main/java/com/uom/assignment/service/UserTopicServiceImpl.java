@@ -6,11 +6,9 @@ import com.uom.assignment.dao.UserTopic;
 import com.uom.assignment.repository.UserTopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
-
 
 /**
  * The {@link Service} implementation for the {@link UserTopic} entity.

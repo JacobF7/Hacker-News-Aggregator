@@ -8,24 +8,24 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A model containing a {@link TopStoryModel} for each {@link Topic#name}.
+ * A model containing a {@link StoryModel} for each {@link Topic#name}.
  *
  * Created by jacobfalzon on 21/05/2017.
  */
 public class TopStoriesModel {
 
-    private final Map<String, TopStoryModel> topStories;
+    private final Map<String, StoryModel> topStories;
 
     public TopStoriesModel(final Map<Topic, Story> topStories) {
 
         this.topStories = topStories.entrySet()
                                    .stream()
                                    .collect(HashMap::new,
-                                            (stories, entry) -> stories.put(entry.getKey().getName(), TopStoryModel.of(entry.getValue())),
+                                            (stories, entry) -> stories.put(entry.getKey().getName(), StoryModel.of(entry.getValue())),
                                             HashMap::putAll);
     }
 
-    public Map<String, TopStoryModel> getTopStories() {
+    private Map<String, StoryModel> getTopStories() {
         return topStories;
     }
 

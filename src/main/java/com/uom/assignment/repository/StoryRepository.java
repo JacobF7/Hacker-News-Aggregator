@@ -29,10 +29,18 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
     /**
      * Find every {@link Story} where {@link Story#lastUpdated} occurs after the specified {@code timestamp}.
      *
-     * @param timestamp the timestamp after which any returned should {@link Story} occur.
+     * @param timestamp the timestamp after which any returned {@link Story} should have been updated.
      * @return a {@link List} containing every {@link Story} where {@link Story#lastUpdated} occurs after the specified {@code timestamp}.
      */
     List<Story> findByLastUpdatedAfter(Long timestamp);
+
+    /**
+     * Find every {@link Story} where {@link Story#creationDate} occurs after the specified {@code timestamp}.
+     *
+     * @param timestamp the timestamp after which any returned {@link Story} should have been created.
+     * @return a {@link List} containing every {@link Story} where {@link Story#creationDate} occurs after the specified {@code timestamp}.
+     */
+    List<Story> findByCreationDateAfter(Long timestamp);
 
     /**
      * Retrieve any {@link Story} which has the {@link Story#title} containing {@code topicName}.

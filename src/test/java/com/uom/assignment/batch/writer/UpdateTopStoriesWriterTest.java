@@ -2,7 +2,7 @@ package com.uom.assignment.batch.writer;
 
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
-import com.uom.assignment.model.request.UpdateTopStoriesModel;
+import com.uom.assignment.model.request.TopStoryModel;
 import com.uom.assignment.service.TopicService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ public class UpdateTopStoriesWriterTest {
     private Topic updatedTopic;
 
     @Mock
-    private UpdateTopStoriesModel mockUpdateTopStoriesModel;
+    private TopStoryModel mockTopStoryModel;
 
     @Mock
     private TopicService topicService;
@@ -42,14 +42,14 @@ public class UpdateTopStoriesWriterTest {
     @Test
     public void write_updatesTopStory() {
 
-        // Mocking mockUpdateTopStoriesModel to contain mockTopic and mockStory
-        Mockito.when(mockUpdateTopStoriesModel.getTopic()).thenReturn(mockTopic);
-        Mockito.when(mockUpdateTopStoriesModel.getStory()).thenReturn(mockStory);
+        // Mocking mockTopStoryModel to contain mockTopic and mockStory
+        Mockito.when(mockTopStoryModel.getTopic()).thenReturn(mockTopic);
+        Mockito.when(mockTopStoryModel.getStory()).thenReturn(mockStory);
 
         // Mocking that the updatedTopic is returned on update
         Mockito.when(topicService.update(mockTopic, mockStory)).thenReturn(updatedTopic);
 
-        updateTopStoriesWriter.write(Collections.singletonList(mockUpdateTopStoriesModel));
+        updateTopStoriesWriter.write(Collections.singletonList(mockTopStoryModel));
 
         // Verifying that mockTopic was updated
         Mockito.verify(topicService).update(mockTopic, mockStory);

@@ -1,8 +1,9 @@
 package com.uom.assignment.batch.step;
 
-import com.uom.assignment.batch.processor.UpdateTopStoriesProcessor;
-import com.uom.assignment.batch.reader.UpdateTopStoriesReader;
-import com.uom.assignment.batch.writer.UpdateTopStoriesWriter;
+import com.uom.assignment.batch.processor.CreateDigestProcessor;
+import com.uom.assignment.batch.reader.CreateDigestReader;
+import com.uom.assignment.batch.writer.CreateDigestWriter;
+import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.model.request.TopStoryModel;
 import org.springframework.batch.core.Step;
@@ -13,36 +14,34 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * The {@link Configuration} for the Update Top Stories Step, which serves to update the {@link Topic#topStory} of every persisted {@link Topic}.
+ * The {@link Configuration} for the Create Digest Step that is responsible for creating a {@link Digest} for every persisted {@link Topic}.
  *
- * Created by jacobfalzon on 23/05/2017.
+ * Created by jacobfalzon on 27/05/2017.
  */
 @Configuration
-public class UpdateTopStoriesStep {
+public class CreateDigestStep {
 
-    public static final String STEP_NAME = "UPDATE_TOP_STORIES_STEP";
+    public static final String STEP_NAME = "CREATE_DIGEST_STEP";
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Value("${batch.update.stories.chunk}")
+    @Value("${batch.new.stories.chunk}")
     private int chunk;
 
     @Autowired
-    public UpdateTopStoriesStep(final StepBuilderFactory stepBuilderFactory) {
+    public CreateDigestStep(final StepBuilderFactory stepBuilderFactory) {
         this.stepBuilderFactory = stepBuilderFactory;
     }
 
-    @Bean(name = UpdateTopStoriesStep.STEP_NAME)
+    @Bean(name = CreateDigestStep.STEP_NAME)
     @Autowired
-    public Step stepNewStories(final UpdateTopStoriesReader reader, final UpdateTopStoriesProcessor processor, final UpdateTopStoriesWriter writer) {
+    public Step stepNewStories(final CreateDigestReader reader, final CreateDigestProcessor processor, final CreateDigestWriter writer) {
         return stepBuilderFactory.get(STEP_NAME)
                 .<Topic, TopStoryModel>chunk(chunk)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
                 .build();
-
-        // TODO ADD ERROR HANDLER
     }
 
 }

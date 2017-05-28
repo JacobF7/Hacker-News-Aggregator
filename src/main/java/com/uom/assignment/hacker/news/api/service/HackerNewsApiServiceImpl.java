@@ -63,15 +63,4 @@ public class HackerNewsApiServiceImpl implements HackerNewsApiService {
                 throw new UnsupportedOperationException(String.format("Response Content Type [%s] is not supported", request.getResponseContentType()));
         }
     }
-
-    public static void main(String[] args) {
-        HackerNewsApiServiceImpl h = new HackerNewsApiServiceImpl();
-
-        try {
-            final ItemResponse hackerNewsResponse = (ItemResponse) h.doGet(new ItemRequest(14417340L));
-            System.out.println(hackerNewsResponse);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

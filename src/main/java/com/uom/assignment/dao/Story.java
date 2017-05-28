@@ -36,17 +36,21 @@ public class Story {
     @Column(name = "last_updated")
     private Long lastUpdated;
 
+    @Column(name = "creation_date")
+    private Long creationDate;
+
     public Story() {
         // Needed by Hibernate
     }
 
-    public Story(final Long hackerNewsId, final String title, final String author, final String url, final Long score) {
+    public Story(final Long hackerNewsId, final String title, final String author, final String url, final Long score, final Long creationDate) {
         this.hackerNewsId = hackerNewsId;
         this.title = title;
         this.author = author;
         this.url = url;
         this.score = score;
-        lastUpdated = System.currentTimeMillis();
+        this.lastUpdated = System.currentTimeMillis();
+        this.creationDate = creationDate;
     }
 
     public Long getId() {
@@ -117,6 +121,14 @@ public class Story {
         this.lastUpdated = lastUpdated;
     }
 
+    public Long getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(final Long creationDate) {
+        this.creationDate = creationDate;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -136,12 +148,13 @@ public class Story {
                Objects.equals(getUrl(), story.getUrl()) &&
                Objects.equals(getScore(), story.getScore()) &&
                Objects.equals(isDeleted(), story.isDeleted()) &&
-               Objects.equals(getLastUpdated(), story.getLastUpdated()) ;
+               Objects.equals(getLastUpdated(), story.getLastUpdated()) &&
+               Objects.equals(getCreationDate(), story.getCreationDate()) ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getHackerNewsId(), getTitle(), getAuthor(), getUrl(), getScore(), isDeleted(), getLastUpdated());
+        return Objects.hash(getId(), getHackerNewsId(), getTitle(), getAuthor(), getUrl(), getScore(), isDeleted(), getLastUpdated(), getCreationDate());
     }
 
     @Override
@@ -155,6 +168,7 @@ public class Story {
                 .add("score", score)
                 .add("deleted", deleted)
                 .add("lastUpdated", lastUpdated)
+                .add("creationDate", creationDate)
                 .toString();
     }
 }

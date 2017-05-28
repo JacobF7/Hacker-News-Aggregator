@@ -42,8 +42,6 @@ public class UpdateStoriesStep {
                 .processor(processor)
                 .writer(writer)
                 .build();
-
-        // TODO ADD ERROR HANDLER
     }
 
 }

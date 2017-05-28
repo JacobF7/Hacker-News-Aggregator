@@ -16,7 +16,7 @@ public class ItemResponse implements HackerNewsResponse {
     private Long id;
     private String type;
     private String by;
-    private String time;
+    private Long time;
     private Long score;
     private String title;
     private String url;
@@ -49,11 +49,11 @@ public class ItemResponse implements HackerNewsResponse {
         this.by = by;
     }
 
-    public String getTime() {
+    public Long getTime() {
         return time;
     }
 
-    public void setTime(final String time) {
+    public void setTime(final Long time) {
         this.time = time;
     }
 

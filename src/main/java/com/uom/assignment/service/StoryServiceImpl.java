@@ -2,6 +2,7 @@ package com.uom.assignment.service;
 
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.repository.StoryRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +33,9 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public Story createOrUpdate(final Long hackerNewsId, final String title, final String author, final String url, final Long score) {
+    public Story createOrUpdate(final Long hackerNewsId, final String title, final String author, final String url, final Long score, final Long creationDate) {
         // If the Story exists, update the score of the Story, otherwise create the story.
-        return findByHackerNewsId(hackerNewsId).map(story -> update(story, score)).orElseGet(() -> storyRepository.save(new Story(hackerNewsId, title, author, url, score)));
+        return findByHackerNewsId(hackerNewsId).map(story -> update(story, score)).orElseGet(() -> storyRepository.save(new Story(hackerNewsId, title, author, url, score, creationDate)));
     }
 
     @Override
@@ -57,8 +58,13 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public List<Story> findActiveByDuration(final Duration duration) {
+    public List<Story> findActiveByLastUpdatedDuration(final Duration duration) {
         return storyRepository.findByLastUpdatedAfter(System.currentTimeMillis() - duration.toMillis()).stream().filter(Story::isActive).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Story> findActiveByCreationDateDuration(final Duration duration) {
+        return storyRepository.findByCreationDateAfter(System.currentTimeMillis() - duration.toMillis()).stream().filter(Story::isActive).collect(Collectors.toList());
     }
 
     @Override
@@ -68,4 +74,13 @@ public class StoryServiceImpl implements StoryService {
                               .filter(Story::isActive)
                               .max(Comparator.comparing(Story::getScore));
     }
+
+    @Override
+    public Optional<Story> findTopStoryByTitleContainingAndCreationDate(final String topicName, final Duration duration) {
+        return findActiveByCreationDateDuration(duration).stream()
+                                                         .filter(Story::isActive)
+                                                         .filter(story -> StringUtils.containsIgnoreCase(story.getTitle(), topicName))
+                                                         .max(Comparator.comparing(Story::getScore));
+    }
+
 }

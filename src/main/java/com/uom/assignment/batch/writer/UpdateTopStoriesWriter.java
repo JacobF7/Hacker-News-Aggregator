@@ -1,7 +1,7 @@
 package com.uom.assignment.batch.writer;
 
 import com.uom.assignment.dao.Topic;
-import com.uom.assignment.model.request.UpdateTopStoriesModel;
+import com.uom.assignment.model.request.TopStoryModel;
 import com.uom.assignment.service.TopicService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import java.util.List;
  * Created by jacobfalzon on 23/05/2017.
  */
 @Component
-public class UpdateTopStoriesWriter implements ItemWriter<UpdateTopStoriesModel> {
+public class UpdateTopStoriesWriter implements ItemWriter<TopStoryModel> {
 
     private static final Logger LOG = LoggerFactory.getLogger(UpdateTopStoriesWriter.class);
 
@@ -29,7 +29,7 @@ public class UpdateTopStoriesWriter implements ItemWriter<UpdateTopStoriesModel>
     }
 
     @Override
-    public void write(final List<? extends UpdateTopStoriesModel> updateTopicModels) {
+    public void write(final List<? extends TopStoryModel> updateTopicModels) {
         updateTopicModels.stream()
                          .map(updateTopicModel -> topicService.update(updateTopicModel.getTopic(), updateTopicModel.getStory()))
                          .forEach(topic -> LOG.info("Updated Top Story of Topic {} to {}", topic.getName(), topic.getTopStory()));

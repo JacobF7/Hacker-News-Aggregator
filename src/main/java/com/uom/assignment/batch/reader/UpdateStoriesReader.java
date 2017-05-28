@@ -40,7 +40,7 @@ public class UpdateStoriesReader implements ItemReader<Story> {
                 break;
 
             case RECENT:
-                stories = new ArrayList<>(storyService.findActiveByDuration(Duration.ofHours(duration)));
+                stories = new ArrayList<>(storyService.findActiveByLastUpdatedDuration(Duration.ofHours(duration)));
                 break;
 
             default:

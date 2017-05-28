@@ -10,13 +10,13 @@ import java.util.Objects;
  *
  * Created by jacobfalzon on 23/05/2017.
  */
-public class UpdateTopStoriesModel {
+public class TopStoryModel {
 
     private final Topic topic;
     private final Story story;
 
 
-    public UpdateTopStoriesModel(final Topic topic, final Story story) {
+    public TopStoryModel(final Topic topic, final Story story) {
         this.topic = topic;
         this.story = story;
     }
@@ -40,7 +40,7 @@ public class UpdateTopStoriesModel {
             return false;
         }
 
-        final UpdateTopStoriesModel that = (UpdateTopStoriesModel) o;
+        final TopStoryModel that = (TopStoryModel) o;
         return Objects.equals(getTopic(), that.getTopic()) &&
                 Objects.equals(getStory(), that.getStory());
     }

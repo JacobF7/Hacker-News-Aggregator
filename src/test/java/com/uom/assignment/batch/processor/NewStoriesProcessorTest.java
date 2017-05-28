@@ -56,6 +56,27 @@ public class NewStoriesProcessorTest {
     }
 
     @Test
+    public void process_itemDeleted_returnsNull() throws Exception  {
+
+        // Mocking mockStoryIdModel to contain STORY_ID
+        Mockito.when(mockStoryIdModel.getId()).thenReturn(STORY_ID);
+
+        // Mocking that mockItemResponse is returned
+        Mockito.when(hackerNewsApiService.doGet(new ItemRequest(Long.valueOf(mockStoryIdModel.getId())))).thenReturn(mockItemResponse);
+
+        // Mocking that the item is deleted
+        Mockito.when(mockItemResponse.isDeleted()).thenReturn(true);
+
+        final ItemResponse itemResponse = newStoriesProcessor.process(mockStoryIdModel);
+
+        // Verifying that the request was made
+        Mockito.verify(hackerNewsApiService).doGet(new ItemRequest(Long.valueOf(mockStoryIdModel.getId())));
+
+        // Verifying that the processor returned null
+        Assert.assertNull(itemResponse);
+    }
+
+    @Test
     public void process_responseUrlSet_returnsItemResponse() throws Exception  {
 
         // Mocking mockStoryIdModel to contain STORY_ID
@@ -63,6 +84,9 @@ public class NewStoriesProcessorTest {
 
         // Mocking that mockItemResponse is returned
         Mockito.when(hackerNewsApiService.doGet(new ItemRequest(Long.valueOf(mockStoryIdModel.getId())))).thenReturn(mockItemResponse);
+
+        // Mocking that the item is NOT deleted
+        Mockito.when(mockItemResponse.isDeleted()).thenReturn(false);
 
         // Mocking that the URL is set
         Mockito.when(mockItemResponse.getUrl()).thenReturn(URL);
@@ -89,6 +113,9 @@ public class NewStoriesProcessorTest {
 
         // Mocking that mockItemResponse is returned
         Mockito.when(hackerNewsApiService.doGet(request)).thenReturn(mockItemResponse);
+
+        // Mocking that the item is NOT deleted
+        Mockito.when(mockItemResponse.isDeleted()).thenReturn(false);
 
         // Mocking that the URL is not set, i.e. it is null
         Mockito.when(mockItemResponse.getUrl()).thenReturn(null);

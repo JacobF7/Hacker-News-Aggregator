@@ -2,7 +2,8 @@ package com.uom.assignment.batch.processor;
 
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
-import com.uom.assignment.model.request.UpdateTopStoriesModel;
+import com.uom.assignment.model.request.TopStoryModel;
+import com.uom.assignment.service.DurationType;
 import com.uom.assignment.service.StoryService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class UpdateTopStoriesProcessorTest {
     private static final String TOPIC_NAME = "topic";
 
     @Test
-    public void process_topStoryExists_topStoryChanges_returnsUpdateTopStoriesModel() {
+    public void process_topStoryExists_topStoryChanges_returnsTopStoryModel() {
 
         // Mocking that mockTopic contains TOPIC_NAME
         Mockito.when(mockTopic.getName()).thenReturn(TOPIC_NAME);
@@ -49,15 +50,15 @@ public class UpdateTopStoriesProcessorTest {
         Mockito.when(mockTopic.getTopStory()).thenReturn(oldTopStory);
 
         // Mocking that newTopStory is the new top story for mockTopic
-        Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.of(newTopStory));
+        Mockito.when(storyService.findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration())).thenReturn(Optional.of(newTopStory));
 
-        final UpdateTopStoriesModel updateTopStoriesModel = updateTopStoriesProcessor.process(mockTopic);
+        final TopStoryModel topStoryModel = updateTopStoriesProcessor.process(mockTopic);
 
         // Verifying that an attempt was made to obtain the top story for mockTopic
-        Mockito.verify(storyService).findTopStoryByTitleContaining(mockTopic.getName());
+        Mockito.verify(storyService).findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration());
 
-        // Verifying that updateTopStoriesModel contains mockTopic and newTopStory
-        Assert.assertEquals(new UpdateTopStoriesModel(mockTopic, newTopStory), updateTopStoriesModel);
+        // Verifying that topStoryModel contains mockTopic and newTopStory
+        Assert.assertEquals(new TopStoryModel(mockTopic, newTopStory), topStoryModel);
     }
 
     @Test
@@ -70,19 +71,19 @@ public class UpdateTopStoriesProcessorTest {
         Mockito.when(mockTopic.getTopStory()).thenReturn(oldTopStory);
 
         // Mocking that oldTopStory is still the top story for mockTopic
-        Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.of(oldTopStory));
+        Mockito.when(storyService.findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration())).thenReturn(Optional.of(oldTopStory));
 
-        final UpdateTopStoriesModel updateTopStoriesModel = updateTopStoriesProcessor.process(mockTopic);
+        final TopStoryModel topStoryModel = updateTopStoriesProcessor.process(mockTopic);
 
         // Verifying that an attempt was made to obtain the top story for mockTopic
-        Mockito.verify(storyService).findTopStoryByTitleContaining(mockTopic.getName());
+        Mockito.verify(storyService).findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration());
 
-        // Verifying that updateTopStoriesModel is null since topStory did not change
-        Assert.assertNull(updateTopStoriesModel);
+        // Verifying that topStoryModel is null since topStory did not change
+        Assert.assertNull(topStoryModel);
     }
 
     @Test
-    public void process_topStoryDoesNotExist_topStoryChanges_returnsUpdateTopStoriesModel() {
+    public void process_topStoryDoesNotExist_topStoryChanges_returnsTopStoryModel() {
 
         // Mocking that mockTopic contains TOPIC_NAME
         Mockito.when(mockTopic.getName()).thenReturn(TOPIC_NAME);
@@ -91,15 +92,15 @@ public class UpdateTopStoriesProcessorTest {
         Mockito.when(mockTopic.getTopStory()).thenReturn(oldTopStory);
 
         // Mocking that mockTopic no longer has a top story, e.g. if oldTopStory got deleted
-        Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.empty());
+        Mockito.when(storyService.findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration())).thenReturn(Optional.empty());
 
-        final UpdateTopStoriesModel updateTopStoriesModel = updateTopStoriesProcessor.process(mockTopic);
+        final TopStoryModel topStoryModel = updateTopStoriesProcessor.process(mockTopic);
 
         // Verifying that an attempt was made to obtain the top story for mockTopic
-        Mockito.verify(storyService).findTopStoryByTitleContaining(mockTopic.getName());
+        Mockito.verify(storyService).findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration());
 
-        // Verifying that updateTopStoriesModel contains mockTopic and no top story, i.e. null
-        Assert.assertEquals(new UpdateTopStoriesModel(mockTopic, null), updateTopStoriesModel);
+        // Verifying that topStoryModel contains mockTopic and no top story, i.e. null
+        Assert.assertEquals(new TopStoryModel(mockTopic, null), topStoryModel);
     }
 
     @Test
@@ -112,15 +113,15 @@ public class UpdateTopStoriesProcessorTest {
         Mockito.when(mockTopic.getTopStory()).thenReturn(null);
 
         // Mocking that mockTopic still has no top story associated to it
-        Mockito.when(storyService.findTopStoryByTitleContaining(mockTopic.getName())).thenReturn(Optional.empty());
+        Mockito.when(storyService.findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration())).thenReturn(Optional.empty());
 
-        final UpdateTopStoriesModel updateTopStoriesModel = updateTopStoriesProcessor.process(mockTopic);
+        final TopStoryModel topStoryModel = updateTopStoriesProcessor.process(mockTopic);
 
         // Verifying that an attempt was made to obtain the top story for mockTopic
-        Mockito.verify(storyService).findTopStoryByTitleContaining(mockTopic.getName());
+        Mockito.verify(storyService).findTopStoryByTitleContainingAndCreationDate(mockTopic.getName(), DurationType.DAILY.getDuration());
 
-        // Verifying that updateTopStoriesModel is null since topStory did not change
-        Assert.assertNull(updateTopStoriesModel);
+        // Verifying that topStoryModel is null since topStory did not change
+        Assert.assertNull(topStoryModel);
     }
 
 }

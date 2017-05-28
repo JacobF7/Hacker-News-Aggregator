@@ -34,9 +34,10 @@ public interface StoryService {
      * @param author the author of the {@link Story}.
      * @param url the url of the {@link Story}.
      * @param score the score of the {@link Story}.
+     * @param creationDate the creation date of the {@link Story}.
      * @return the {@link Story} that is created or updated.
      */
-    Story createOrUpdate(Long hackerNewsId, String title, String author, String url, Long score);
+    Story createOrUpdate(Long hackerNewsId, String title, String author, String url, Long score, Long creationDate);
 
     /**
      * Updates the {@link Story#score} of the given {@link Story}.
@@ -67,16 +68,37 @@ public interface StoryService {
      * Retrieves every persisted {@link Story} where the duration between now and {@link Story#lastUpdated} is NOT longer than specified {@link Duration}.
      * Note that any {@link Story} that is {@link Story#deleted} is ignored.
      *
-     * @return a {@link List} containing ever persisted {@link Story}.
+     * @param duration the {@link Duration} of time.
+     * @return a {@link List} containing ever persisted {@link Story} where the duration between now and {@link Story#lastUpdated} is NOT longer than specified {@link Duration}.
      */
-    List<Story> findActiveByDuration(Duration duration);
+    List<Story> findActiveByLastUpdatedDuration(Duration duration);
+
+    /**
+     * Retrieves every persisted {@link Story} where the duration between now and {@link Story#creationDate} is NOT longer than specified {@link Duration}.
+     * Note that any {@link Story} that is {@link Story#deleted} is ignored.
+     *
+     * @param duration the {@link Duration} of time.
+     * @return a {@link List} containing ever persisted {@link Story} where the duration between now and {@link Story#creationDate} is NOT longer than specified {@link Duration}.
+     */
+    List<Story> findActiveByCreationDateDuration(Duration duration);
 
     /**
      * Retrieve the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
      * Note that any {@link Story} that is {@link Story#deleted} is ignored.
      *
      * @param topicName the name of the {@link Topic}.
-     * @return a {@link Story} which has the {@link Story#title} containing {@code topicName}.
+     * @return the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
      */
     Optional<Story> findTopStoryByTitleContaining(String topicName);
+
+    /**
+     * Retrieve the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
+     * Note that the {@link Duration} between now and the {@link Story#creationDate} must NOT be longer than the specified {@link Duration}.
+     * Note that any {@link Story} that is {@link Story#deleted} is ignored.
+     *
+     * @param topicName the name of the {@link Topic}.
+     * @param duration the {@link Duration} of time.
+     * @return the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
+     */
+    Optional<Story> findTopStoryByTitleContainingAndCreationDate(String topicName, Duration duration);
 }

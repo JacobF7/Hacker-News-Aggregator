@@ -10,10 +10,28 @@ CREATE TABLE session (
   `user_id` INT(11) NOT NULL,
   `token` VARCHAR(255) NOT NULL UNIQUE,
   `last_activity` BIGINT(22) NOT NULL,
-
   PRIMARY KEY (id),
   FOREIGN KEY user_fk (user_id) REFERENCES user(id)
 ) ENGINE = InnoDB;
+
+CREATE TABLE topic (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL UNIQUE ,
+  `top_story_id` INT(11),
+  PRIMARY KEY (id),
+  FOREIGN KEY story_fk (top_story_id) REFERENCES story(id) ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE user_topic (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `topic_id` INT(11)  NOT NULL,
+  `effective_from` BIGINT(22) NULL,
+  `effective_to` BIGINT(22) NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY user_fk (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY topic_fk (topic_id) REFERENCES topic(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 CREATE TABLE story (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -24,24 +42,17 @@ CREATE TABLE story (
   `score` INT(11) NOT NULL,
   `deleted` BOOLEAN NOT NULL,
   `last_updated` BIGINT(22) NOT NULL,
+  'creation_date' BIGINT(22) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE topic (
+CREATE TABLE digest (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NOT NULL UNIQUE ,
-  `top_story_id` INT(11) ,
-  PRIMARY KEY (id),
-  FOREIGN KEY story_fk (top_story_id) REFERENCES story(id) ON UPDATE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE user_topic (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `topic_id` INT(10)  NOT NULL,
-  `effective_from` BIGINT(22) NULL,
-  `effective_to` BIGINT(22) NULL,
+  `topic_id` INT(11) NOT NULL,
+  `top_story_id` INT(11) NOT NULL,
+  `effective_from` BIGINT(22) NOT NULL,
+  `effective_to` BIGINT(22) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY user_fk (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY topic_fk (topic_id) REFERENCES topic(id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY topic_fk (topic_id) REFERENCES topic(id) ON UPDATE CASCADE,
+  FOREIGN KEY story_fk (top_story_id) REFERENCES story(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB;

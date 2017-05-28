@@ -36,7 +36,7 @@ public class CreateDigestScheduledTask {
         this.job = job;
     }
 
-    @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds // TODO CRON
+   // @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds // TODO CRON
     public void createDigest() {
 
         LOG.info("Running Create Digest Scheduled Task");

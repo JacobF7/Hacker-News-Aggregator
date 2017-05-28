@@ -7,7 +7,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestHeader;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * An {@link Aspect} serving to authenticate any protected API.
@@ -26,21 +27,23 @@ public class AuthenticationAspect {
     }
 
     /**
-     * This {@link Pointcut} is used to identify the Authorization Token that is annotated by the {@link AuthorizationHeader} and {@link RequestHeader} annotations.
+     * This {@link Pointcut} is used to identify the {@link HttpServletRequest} containing the Authorization Token Header that is annotated by the {@link AuthorizationHeader} annotation.
      *
-     * @param authorization the authorization token annotated by the {@link AuthorizationHeader} and {@link RequestHeader}.
+     * @param request the {@link HttpServletRequest} containing the Authorization Token Header annotated by the {@link AuthorizationHeader} annotation.
      */
-    @Pointcut("execution(* *(@AuthorizationHeader (String),..)) && execution(* *(@org.springframework.web.bind.annotation.RequestHeader (String),..)) && args(authorization,..)")
-    public void authorizationHeaderPointcut(final String authorization){}
+    @Pointcut("execution(* *(@AuthorizationHeader (javax.servlet.http.HttpServletRequest),..)) && args(request,..)")
+    public void requestPointcut(final HttpServletRequest request){}
 
     /**
      * The {@link Before} advice serving to authenticate any protected API.
-     * If the {@code authorization} token is valid, the associated {@link Session} is refreshed.
+     * If the Authorization Token Header is valid, the associated {@link Session} is refreshed and the .
      *
-     * @param authorization the authorization token annotated by {@link AuthorizationHeader} and {@link RequestHeader}.
+     * @param request the {@link HttpServletRequest} containing the Authorization Token Header annotated by the {@link AuthorizationHeader} annotation.
      */
-    @Before("authorizationHeaderPointcut(authorization)")
-    public void authenticate(final String authorization) {
-        sessionService.authenticate(authorization);
+    @Before("requestPointcut(request)")
+    public void authenticate(final HttpServletRequest request) {
+        final String authorizationToken = request.getHeader(AuthorizationHeader.AUTHORIZATION_HEADER);
+        final Long userId = sessionService.authenticate(authorizationToken);
+        request.setAttribute(AuthorizationHeader.USER_ID, userId);
     }
 }

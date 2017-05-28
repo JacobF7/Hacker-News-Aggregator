@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -36,8 +37,9 @@ public class SessionController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    public void logout(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization) {
-        sessionService.logout(authorization);
+    public void logout(@AuthorizationHeader final HttpServletRequest request) {
+        final String token = request.getHeader(AuthorizationHeader.AUTHORIZATION_HEADER);
+        sessionService.logout(token);
     }
 
 }

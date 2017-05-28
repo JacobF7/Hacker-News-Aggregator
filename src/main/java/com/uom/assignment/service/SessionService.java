@@ -48,9 +48,10 @@ public interface SessionService {
      * Attempts to authenticate a {@link Session#token}.
      *
      * @param token the {@link Session#token} to authenticate.
+     * @return the {@link User#id} resolved from the {@link Session}, if the {@link Session#token} is successfully authenticated.
      * @throws BusinessErrorException when the specified {@link Session#token} is already expired or does not exist.
      */
-    void authenticate(String token);
+    Long authenticate(String token);
 
     /**
      * Expire any active {@link Session} with the given {@link Session#token}.

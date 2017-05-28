@@ -5,6 +5,7 @@ import com.uom.assignment.model.request.UserModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -32,8 +33,8 @@ public class TestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public void testAuthenticationAspect(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization) {
-
+    public void testAuthenticationAspect(@AuthorizationHeader final HttpServletRequest request) {
+        System.out.println(request.getAttribute(AuthorizationHeader.USER_ID));
     }
 }
 

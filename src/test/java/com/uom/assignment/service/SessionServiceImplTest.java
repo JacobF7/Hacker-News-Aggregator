@@ -55,7 +55,7 @@ public class SessionServiceImplTest {
     @Before
     public void setup() {
 
-        // Mocking mockUser to contain USER_ID
+        // Mocking mockUser to contain SESSION_ID
         Mockito.when(mockSession.getId()).thenReturn(SESSION_ID);
 
         // Mocking mockSession to contain SESSION_TOKEN
@@ -206,15 +206,18 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public void authenticate_validToken_sessionRefreshed() {
+    public void authenticate_validToken_sessionRefreshed_returnsUserId() {
 
         // Mock lastActivity as now, i.e. mockSession is not expired.
         Mockito.when(mockSession.getLastActivity()).thenReturn(System.currentTimeMillis());
 
-        sessionService.authenticate(mockSession.getToken());
+        final Long userId = sessionService.authenticate(mockSession.getToken());
 
         // Verifying Session is refreshed
         Mockito.verify(mockSession).setLastActivity(Matchers.anyLong());
+
+        // Verifying that USER_ID is returned
+        Assert.assertEquals(USER_ID, userId);
     }
 
     @Test

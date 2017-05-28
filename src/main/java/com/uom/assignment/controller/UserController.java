@@ -1,7 +1,6 @@
 package com.uom.assignment.controller;
 
 import com.uom.assignment.aspect.AuthorizationHeader;
-import com.uom.assignment.dao.Session;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.Objects;
@@ -31,12 +31,10 @@ public class UserController {
     static final String RESOURCE = "/users";
 
     private UserService userService;
-    private SessionService sessionService;
 
     @Autowired
-    public UserController(final UserService userService, final SessionService sessionService) {
+    public UserController(final UserService userService) {
         this.userService = userService;
-        this.sessionService = sessionService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -46,16 +44,13 @@ public class UserController {
     }
 
     @RequestMapping(value ="/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<UserTopicModel> update(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization,
+    public ResponseEntity<UserTopicModel> update(@AuthorizationHeader final HttpServletRequest request,
                                                  @PathVariable final Long id,
                                                  @RequestBody @Valid final TopicModel topicModel) {
 
-        // TODO CONFIRM THIS
-        // Should NOT occur, due to Authentication Aspect
-        final Session session = sessionService.findByToken(authorization).orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_TOKEN));
 
-        // Make sure that the userId matches the id of the user obtained from the session
-        if(!Objects.equals(id, session.getUser().getId())) {
+        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
+        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
             throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
         }
 
@@ -64,14 +59,11 @@ public class UserController {
     }
 
     @RequestMapping(value ="/{id}/real-time-stories", method = RequestMethod.GET)
-    public ResponseEntity<TopStoriesModel> getRealTimeTopStories(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization,
+    public ResponseEntity<TopStoriesModel> getRealTimeTopStories(@AuthorizationHeader final HttpServletRequest request,
                                                                  @PathVariable final Long id) {
 
-        // Should NOT occur, due to Authentication Aspect
-        final Session session = sessionService.findByToken(authorization).orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_TOKEN));
-
-        // Make sure that the userId matches the id of the user obtained from the session
-        if(!Objects.equals(id, session.getUser().getId())) {
+        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
+        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
             throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
         }
 
@@ -81,14 +73,11 @@ public class UserController {
     }
 
     @RequestMapping(value ="/{id}/stories", method = RequestMethod.GET)
-    public ResponseEntity<TopStoriesModel> getTopStories(@AuthorizationHeader @RequestHeader(AuthorizationHeader.AUTHORIZATION_HEADER) final String authorization,
+    public ResponseEntity<TopStoriesModel> getTopStories(@AuthorizationHeader final HttpServletRequest request,
                                                          @PathVariable final Long id) {
 
-        // Should NOT occur, due to Authentication Aspect
-        final Session session = sessionService.findByToken(authorization).orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_TOKEN));
-
-        // Make sure that the userId matches the id of the user obtained from the session
-        if(!Objects.equals(id, session.getUser().getId())) {
+        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
+        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
             throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
         }
 

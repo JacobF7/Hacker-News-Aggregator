@@ -25,7 +25,7 @@ public class TopStoriesModel {
                                             HashMap::putAll);
     }
 
-    private Map<String, StoryModel> getTopStories() {
+    public Map<String, StoryModel> getTopStories() {
         return topStories;
     }
 

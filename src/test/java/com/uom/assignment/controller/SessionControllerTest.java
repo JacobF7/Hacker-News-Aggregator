@@ -1,5 +1,6 @@
 package com.uom.assignment.controller;
 
+import com.uom.assignment.aspect.AuthorizationHeader;
 import com.uom.assignment.model.request.UserLoginModel;
 import com.uom.assignment.model.response.TokenModel;
 import com.uom.assignment.service.SessionService;
@@ -12,6 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * A test suite for {@link SessionController}.
  *
@@ -19,6 +22,9 @@ import org.springframework.http.ResponseEntity;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SessionControllerTest {
+
+    @Mock
+    private HttpServletRequest request;
 
     @Mock
     private SessionService sessionService;
@@ -49,7 +55,10 @@ public class SessionControllerTest {
 
     @Test
     public void logout_delegatesToSessionService() {
-        sessionController.logout(TOKEN);
+
+        Mockito.when(request.getHeader(AuthorizationHeader.AUTHORIZATION_HEADER)).thenReturn(TOKEN);
+
+        sessionController.logout(request);
 
         Mockito.verify(sessionService).logout(TOKEN);
     }

@@ -76,7 +76,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void authenticate(final String token) {
+    public Long authenticate(final String token) {
 
         // Check if the token exists
         final Session session = findByToken(token).orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_TOKEN));
@@ -88,6 +88,8 @@ public class SessionServiceImpl implements SessionService {
 
         // If the Session is active, we refresh it
         refresh(session);
+
+        return session.getUser().getId();
     }
 
     @Override

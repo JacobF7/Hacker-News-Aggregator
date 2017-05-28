@@ -18,4 +18,9 @@ public @interface AuthorizationHeader {
     * The Authorization Header Key.
     */
    String AUTHORIZATION_HEADER = "Authorization";
+
+   /**
+    * The Session User Id for the valid AUTHORIZATION_HEADER
+    */
+   String USER_ID = "USER_ID";
 }

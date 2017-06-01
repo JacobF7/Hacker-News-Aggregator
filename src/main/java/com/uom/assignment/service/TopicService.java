@@ -31,7 +31,7 @@ public interface TopicService {
      * @param topicName the name of the {@link Topic}.
      * @return the {@link Topic} that is created or fetched.
      */
-    Topic create(final String topicName);
+    Topic create(String topicName);
 
     /**
      * Retrieves every persisted {@link Topic}.

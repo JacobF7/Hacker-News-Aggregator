@@ -36,12 +36,13 @@ public class UpdateStoriesScheduledTask {
         this.job = job;
     }
 
-    @Scheduled(fixedDelay = 1_800_000) //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight // TODO DONT FORGET THIS
+    //@Scheduled(fixedDelay = 1_800_000) //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight // TODO DONT FORGET THIS
+    @Scheduled(fixedDelay = 1_800_000, initialDelay = 60_000)
     public void updateAllStories() {
         updateStories(FetchMode.ALL);
     }
 
-//    @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds
+    //@Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds
     public void updateRecentStories() {
         updateStories(FetchMode.RECENT);
     }

@@ -89,6 +89,7 @@ public interface StoryService {
      * @param topicName the name of the {@link Topic}.
      * @return the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
      */
+    @Deprecated // TODO REMOVE
     Optional<Story> findTopStoryByTitleContaining(String topicName);
 
     /**
@@ -101,4 +102,27 @@ public interface StoryService {
      * @return the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
      */
     Optional<Story> findTopStoryByTitleContainingAndCreationDate(String topicName, Duration duration);
+
+    /**
+     * Retrieve the overall Top {@code n} Stories.
+     * Note that the {@link Duration} between now and the {@link Story#creationDate} must NOT be longer than the specified {@link Duration}.
+     * Note that any {@link Story} that is {@link Story#deleted} is ignored.
+     *
+     * @param duration the {@link Duration} of time.
+     * @param n the number of Top Stories to be returned.
+     * @return a {@link List} containing the Top {@code n} Stories.
+     */
+    List<Story> findOverallTopStoriesByCreationDate(Duration duration, int n);
+
+    /**
+     * Retrieve the Top {@code n} Stories which have the {@link Story#title} containing {@code topicName}.
+     * Note that the {@link Duration} between now and the {@link Story#creationDate} must NOT be longer than the specified {@link Duration}.
+     * Note that any {@link Story} that is {@link Story#deleted} is ignored.
+     *
+     * @param topicName the name of the {@link Topic}.
+     * @param duration the {@link Duration} of time.
+     * @param n the number of Top Stories to be returned.
+     * @return a {@link List} containing the Top {@code n} Stories.
+     */
+    List<Story> findTopStoriesByTitleContainingAndCreationDate(String topicName, Duration duration, int n);
 }

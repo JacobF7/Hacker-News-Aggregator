@@ -4,6 +4,7 @@ import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
 import com.uom.assignment.dao.UserTopic;
 import com.uom.assignment.repository.UserTopicRepository;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * A test suite for {@link UserTopicService}.
@@ -29,10 +31,16 @@ public class UserTopicServiceImplTest {
     private Topic newTopic;
 
     @Mock
+    private Topic mockTopic;
+
+    @Mock
     private User mockUser;
 
     @Mock
     private UserTopic oldUserTopic;
+
+    @Mock
+    private UserTopic mockUserTopic;
 
     @Mock
     private UserTopicRepository userTopicRepository;
@@ -94,4 +102,18 @@ public class UserTopicServiceImplTest {
         Mockito.verify(userTopicRepository).save(Mockito.any(UserTopic.class));
     }
 
+    @Test
+    public void findEffectiveByTopic_returnsUserTopics() {
+
+        // Mocking that mockUserTopic is returned
+        Mockito.when(userTopicRepository.findByTopicAndEffectiveToIsNull(mockTopic)).thenReturn(Collections.singleton(mockUserTopic));
+
+        final Set<UserTopic> userTopics = userTopicService.findEffectiveByTopic(mockTopic);
+
+        // Verifying that an attempt was made to retrieve the effective user topics by topic name
+        Mockito.verify(userTopicRepository).findByTopicAndEffectiveToIsNull(mockTopic);
+
+        // Verifying that mockUserTopic was returned
+        Assert.assertEquals(Collections.singleton(mockUserTopic), userTopics);
+    }
 }

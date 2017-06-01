@@ -1,7 +1,7 @@
 package com.uom.assignment.controller;
 
 import com.uom.assignment.aspect.AuthorizationHeader;
-import com.uom.assignment.model.request.UserModel;
+import com.uom.assignment.model.request.DateRangeModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ public class TestController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public void testModelValidation(final @RequestBody @Valid UserModel userModel) {}
+    public void testModelValidation(final @RequestBody @Valid DateRangeModel model) {}
 
     @RequestMapping(method = RequestMethod.PATCH)
     public String testRuntimeException() {

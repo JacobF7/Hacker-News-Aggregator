@@ -3,6 +3,7 @@ package com.uom.assignment.batch.job;
 import com.uom.assignment.batch.step.CreateDigestStep;
 import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Topic;
+import com.uom.assignment.dao.User;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * The {@link CreateDigestJob} for the Create Digest Job that is responsible for creating a {@link Digest} for every persisted {@link Topic}.
+ * The {@link Configuration} for the Create Digest Job that is responsible for creating a {@link Digest} for the {@link Topic}s that every {@link User} is subscribed to.
  *
  * Created by jacobfalzon on 27/05/2017.
  */

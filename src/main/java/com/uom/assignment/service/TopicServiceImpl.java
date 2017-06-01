@@ -49,7 +49,9 @@ public class TopicServiceImpl implements TopicService {
         final String sanitizedTopic = TopicService.sanitize(topic);
 
         // If a topic already exists, fetch it, otherwise create a new one.
-        return this.findByName(sanitizedTopic).orElseGet(() -> topicRepository.save(new Topic(sanitizedTopic, storyService.findTopStoryByTitleContaining(sanitizedTopic).orElse(null))));
+        return this.findByName(sanitizedTopic)
+                   .orElseGet(() -> topicRepository.save(new Topic(sanitizedTopic,
+                                                                   storyService.findTopStoryByTitleContainingAndCreationDate(sanitizedTopic, DurationType.DAILY.getDuration()).orElse(null))));
     }
 
     @Override

@@ -26,6 +26,9 @@ public class StoryServiceImplTest {
     private Story mockTopStory;
 
     @Mock
+    private Story mockAverageStory;
+
+    @Mock
     private StoryRepository storyRepository;
 
     @InjectMocks
@@ -41,6 +44,7 @@ public class StoryServiceImplTest {
     private static final Duration DURATION = Duration.ofMillis(RANDOM.nextLong());
     private static final String TOPIC = "topic";
     private static final Long LOW_SCORE = 0L;
+    private static final Long AVERAGE_SCORE = 5L;
     private static final Long TOP_SCORE = 10L;
     private static final Long CREATION_DATE = RANDOM.nextLong();
 
@@ -254,7 +258,7 @@ public class StoryServiceImplTest {
         Mockito.when(mockTopStory.isActive()).thenReturn(true);
 
         // Mocking that mockStory has a lower score, i.e. LOW_SCORE
-        Mockito.when(mockTopStory.getScore()).thenReturn(LOW_SCORE);
+        Mockito.when(mockStory.getScore()).thenReturn(LOW_SCORE);
 
         // Mocking that mockTopStory has a higher score, i.e. TOP_SCORE
         Mockito.when(mockTopStory.getScore()).thenReturn(TOP_SCORE);
@@ -313,7 +317,7 @@ public class StoryServiceImplTest {
 
     @Test
     public void findTopStoryByTitleContainingAndCreationDate_mockStoryActive_mockTopStoryActive_mockTopStoryBetterScore_returnsMockTopStory() {
-        // Mocking that findByTitleContaining returns a list containing mockStory and mockTopStory
+        // Mocking that findByCreationDateAfter returns a list containing mockStory and mockTopStory
         Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory));
 
         // Mocking that mockStory is active
@@ -323,7 +327,7 @@ public class StoryServiceImplTest {
         Mockito.when(mockTopStory.isActive()).thenReturn(true);
 
         // Mocking that mockStory has a lower score, i.e. LOW_SCORE
-        Mockito.when(mockTopStory.getScore()).thenReturn(LOW_SCORE);
+        Mockito.when(mockStory.getScore()).thenReturn(LOW_SCORE);
 
         // Mocking that mockTopStory has a higher score, i.e. TOP_SCORE
         Mockito.when(mockTopStory.getScore()).thenReturn(TOP_SCORE);
@@ -344,8 +348,8 @@ public class StoryServiceImplTest {
     }
 
     @Test
-    public void findTopStoryByTitleContainingAndCreationDate_mockStoryDeleted_mockTopStoryDeleted_returnsEmptyList() {
-        // Mocking that findByTitleContaining returns a list containing mockStory and mockTopStory
+    public void findTopStoryByTitleContainingAndCreationDate_mockStoryDeleted_mockTopStoryDeleted_returnsEmptyOptional() {
+        // Mocking that findByCreationDateAfter returns a list containing mockStory and mockTopStory
         Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory));
 
         // Mocking that mockStory is deleted
@@ -356,10 +360,161 @@ public class StoryServiceImplTest {
 
         final Optional<Story> topStory = storyService.findTopStoryByTitleContainingAndCreationDate(TOPIC, DurationType.DAILY.getDuration());
 
-        // Verifying that findTopStoryByTitleContainingAndCreationDate was called
+        // Verifying that findByCreationDateAfter was called
         Mockito.verify(storyRepository).findByCreationDateAfter(Matchers.anyLong());
 
         // Verifying that no story was returned
         Assert.assertEquals(Optional.empty(), topStory);
     }
+
+    @Test
+    public void findOverallTopStoriesByCreationDate_returnsTopStories() {
+        // Mocking that findByTitleContaining returns a list containing mockStory, mockTopStory and mockAverageStory
+        Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory, mockAverageStory));
+
+        // Mocking that mockStory is NOT deleted
+        Mockito.when(mockStory.isActive()).thenReturn(true);
+
+        // Mocking that mockAverageStory is NOT deleted
+        Mockito.when(mockAverageStory.isActive()).thenReturn(true);
+
+        // Mocking that mockTopStory is NOT deleted
+        Mockito.when(mockTopStory.isActive()).thenReturn(true);
+
+        // Mocking that mockStory has a lower score, i.e. LOW_SCORE
+        Mockito.when(mockStory.getScore()).thenReturn(LOW_SCORE);
+
+        // Mocking that mockAverageStory has an average score, i.e. AVERAGE_SCORE
+        Mockito.when(mockAverageStory.getScore()).thenReturn(AVERAGE_SCORE);
+
+        // Mocking that mockTopStory has a higher score, i.e. TOP_SCORE
+        Mockito.when(mockTopStory.getScore()).thenReturn(TOP_SCORE);
+
+        final int N = 2;
+
+        final List<Story> topStories = storyService.findOverallTopStoriesByCreationDate(DurationType.WEEKLY.getDuration(), N);
+
+        // Verifying that findByCreationDateAfter was called
+        Mockito.verify(storyRepository).findByCreationDateAfter(Matchers.anyLong());
+
+        // Verifying that N top stories were returned
+        Assert.assertEquals(N, topStories.size());
+
+        // Verifying that mockTopStory and mockAverageStory were the returned top stories
+        Assert.assertEquals(Arrays.asList(mockTopStory, mockAverageStory), topStories);
+    }
+
+    @Test
+    public void findOverallTopStoriesByCreationDate_mockStoryDeleted_mockTopStoryDeleted_returnsEmptyList() {
+
+        // Mocking that findByTitleContaining returns a list containing mockStory and mockTopStory
+        Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory));
+
+        // Mocking that mockStory is deleted
+        Mockito.when(mockStory.isActive()).thenReturn(false);
+
+        // Mocking that mockTopStory is deleted
+        Mockito.when(mockTopStory.isActive()).thenReturn(false);
+
+        final int N = 2;
+
+        final List<Story> topStories = storyService.findOverallTopStoriesByCreationDate(DurationType.WEEKLY.getDuration(), N);
+
+        // Verifying that findByCreationDateAfter was called
+        Mockito.verify(storyRepository).findByCreationDateAfter(Matchers.anyLong());
+
+        // Verifying that no story was returned
+        Assert.assertEquals(topStories, Collections.emptyList());
+    }
+
+    @Test
+    public void findTopStoriesByTitleContainingAndCreationDate_returnsTopStories() {
+        // Mocking that findByTitleContaining returns a list containing mockStory, mockTopStory and mockAverageStory
+        Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory, mockAverageStory));
+
+        // Mocking that mockStory is NOT deleted
+        Mockito.when(mockStory.isActive()).thenReturn(true);
+
+        // Mocking that mockAverageStory is NOT deleted
+        Mockito.when(mockAverageStory.isActive()).thenReturn(true);
+
+        // Mocking that mockTopStory is NOT deleted
+        Mockito.when(mockTopStory.isActive()).thenReturn(true);
+
+        // Mocking that mockStory has a lower score, i.e. LOW_SCORE
+        Mockito.when(mockStory.getScore()).thenReturn(LOW_SCORE);
+
+        // Mocking that mockAverageStory has an average score, i.e. AVERAGE_SCORE
+        Mockito.when(mockAverageStory.getScore()).thenReturn(AVERAGE_SCORE);
+
+        // Mocking that mockTopStory has a higher score, i.e. TOP_SCORE
+        Mockito.when(mockTopStory.getScore()).thenReturn(TOP_SCORE);
+
+        // Mocking that mockStory contains TOPIC
+        Mockito.when(mockStory.getTitle()).thenReturn(TITLE + TOPIC);
+
+        // Mocking that mockAverageStory does NOT contain TOPIC
+        Mockito.when(mockAverageStory.getTitle()).thenReturn(TITLE);
+
+        // Mocking that mockTopStory contains TOPIC
+        Mockito.when(mockTopStory.getTitle()).thenReturn(TITLE + TOPIC);
+
+        final int N = 2;
+
+        final List<Story> topStories = storyService.findTopStoriesByTitleContainingAndCreationDate(TOPIC, DurationType.WEEKLY.getDuration(), N);
+
+        // Verifying that findByCreationDateAfter was called
+        Mockito.verify(storyRepository).findByCreationDateAfter(Matchers.anyLong());
+
+        // Verifying that N top stories were returned
+        Assert.assertEquals(N, topStories.size());
+
+        // Verifying that mockTopStory and mockStory were the returned top stories
+        Assert.assertEquals(Arrays.asList(mockTopStory, mockStory), topStories);
+    }
+
+    @Test
+    public void findTopStoriesByTitleContainingAndCreationDate_mockStoryDeleted_mockTopStoryDeleted_returnsEmptyList() {
+
+        // Mocking that findByTitleContaining returns a list containing mockStory and mockTopStory
+        Mockito.when(storyRepository.findByCreationDateAfter(Matchers.anyLong())).thenReturn(Arrays.asList(mockStory, mockTopStory, mockAverageStory));
+
+        // Mocking that mockStory is NOT deleted
+        Mockito.when(mockStory.isActive()).thenReturn(true);
+
+        // Mocking that mockAverageStory is NOT deleted
+        Mockito.when(mockAverageStory.isActive()).thenReturn(true);
+
+        // Mocking that mockTopStory is deleted
+        Mockito.when(mockTopStory.isActive()).thenReturn(false);
+
+        // Mocking that mockStory has a lower score, i.e. LOW_SCORE
+        Mockito.when(mockStory.getScore()).thenReturn(LOW_SCORE);
+
+        // Mocking that mockAverageStory has an average score, i.e. AVERAGE_SCORE
+        Mockito.when(mockAverageStory.getScore()).thenReturn(AVERAGE_SCORE);
+
+        // Mocking that mockTopStory has a higher score, i.e. TOP_SCORE
+        Mockito.when(mockTopStory.getScore()).thenReturn(TOP_SCORE);
+
+        // Mocking that mockStory contains TOPIC
+        Mockito.when(mockStory.getTitle()).thenReturn(TITLE + TOPIC);
+
+        // Mocking that mockAverageStory does NOT contain TOPIC
+        Mockito.when(mockAverageStory.getTitle()).thenReturn(TITLE);
+
+        // Mocking that mockTopStory contains TOPIC
+        Mockito.when(mockTopStory.getTitle()).thenReturn(TITLE + TOPIC);
+
+        final int N = 2;
+
+        final List<Story> topStories = storyService.findTopStoriesByTitleContainingAndCreationDate(TOPIC, DurationType.WEEKLY.getDuration(), N);
+
+        // Verifying that findByCreationDateAfter was called
+        Mockito.verify(storyRepository).findByCreationDateAfter(Matchers.anyLong());
+
+        // Verifying that mockStory were the returned top stories
+        Assert.assertEquals(Collections.singletonList(mockStory), topStories);
+    }
+
 }

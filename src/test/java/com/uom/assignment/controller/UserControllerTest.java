@@ -1,15 +1,14 @@
 package com.uom.assignment.controller;
 
+import com.google.common.collect.ImmutableMap;
 import com.uom.assignment.aspect.AuthorizationHeader;
-import com.uom.assignment.dao.Session;
-import com.uom.assignment.dao.Story;
-import com.uom.assignment.dao.Topic;
-import com.uom.assignment.dao.User;
+import com.uom.assignment.dao.*;
+import com.uom.assignment.model.request.DateRangeModel;
 import com.uom.assignment.model.request.TopicModel;
 import com.uom.assignment.model.request.UserModel;
 import com.uom.assignment.model.response.TopStoriesModel;
+import com.uom.assignment.model.response.UserDigestsModel;
 import com.uom.assignment.model.response.UserTopicModel;
-import com.uom.assignment.service.SessionService;
 import com.uom.assignment.service.TopicService;
 import com.uom.assignment.service.UserService;
 import org.junit.Assert;
@@ -23,8 +22,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +41,25 @@ public class UserControllerTest {
     private HttpServletRequest mockRequest;
 
     @Mock
+    private Digest mockFirstWeekTopicDigest;
+
+    @Mock
+    private Digest mockFirstWeekOverallDigest;
+
+    @Mock
+    private Digest mockSecondWeekTopicDigest;
+
+    @Mock
     private Story mockStory;
+
+    @Mock
+    private Story mockFirstWeekTopicTopStory;
+
+    @Mock
+    private Story mockFirstWeekOverallTopStory;
+
+    @Mock
+    private Story mockSecondWeekTopicTopStory;
 
     @Mock
     private Topic mockTopic;
@@ -60,6 +78,25 @@ public class UserControllerTest {
     private static final String URL = "url";
     private static final Long SCORE = RANDOM.nextLong();
 
+    private static final LocalDate END_DATE = LocalDate.now(); // now
+    private static final LocalDate START_DATE = END_DATE.minusWeeks(-3L); // three week ago
+    private static final DateRangeModel DATE_RANGE_MODEL = new DateRangeModel(START_DATE, END_DATE);
+
+    private static final LocalDate TWO_WEEKS_AGO = END_DATE.minusWeeks(-2L);
+    private static final LocalDate ONE_WEEK_AGO = END_DATE.minusWeeks(-1L);
+
+    private static final String FIRST_WEEK_TOPIC_TOP_STORY_TITLE = "FIRST_WEEK_TOPIC_TOP_STORY_TITLE";
+    private static final String FIRST_WEEK_TOPIC_TOP_STORY_URL = "FIRST_WEEK_TOPIC_TOP_STORY_URL";
+    private static final Long FIRST_WEEK_TOPIC_TOP_STORY_SCORE = RANDOM.nextLong();
+
+    private static final String FIRST_WEEK_OVERALL_TOP_STORY_TITLE = "FIRST_WEEK_OVERALL_TOP_STORY_TITLE";
+    private static final String FIRST_WEEK_OVERALL_TOP_STORY_URL = "FIRST_WEEK_OVERALL_TOP_STORY_URL";
+    private static final Long FIRST_WEEK_OVERALL_TOP_STORY_SCORE = RANDOM.nextLong();
+
+    private static final String SECOND_WEEK_TOPIC_TOP_STORY_TITLE = "SECOND_WEEK_TOPIC_TOP_STORY_TITLE";
+    private static final String SECOND_WEEK_TOPIC_TOP_STORY_URL = "SECOND_WEEK_TOPIC_TOP_STORY_URL";
+    private static final Long SECOND_WEEK_TOPIC_TOP_STORY_SCORE = RANDOM.nextLong();
+
     @Before
     public void setup() {
 
@@ -74,6 +111,36 @@ public class UserControllerTest {
 
         // Mocking that mockStory has SCORE
         Mockito.when(mockStory.getScore()).thenReturn(SCORE);
+
+        // Mocking that mockFirstWeekTopicDigest is a topic digest for mockTopic and mockFirstWeekTopicTopStory
+        Mockito.when(mockFirstWeekTopicDigest.getOverall()).thenReturn(false);
+        Mockito.when(mockFirstWeekTopicDigest.getTopic()).thenReturn(mockTopic);
+        Mockito.when(mockFirstWeekTopicDigest.getStory()).thenReturn(mockFirstWeekTopicTopStory);
+
+        // Mocking that mockFirstWeekOverallDigest is an overall digest and mockFirstWeekOverallTopStory
+        Mockito.when(mockFirstWeekOverallDigest.getOverall()).thenReturn(true);
+        Mockito.when(mockFirstWeekOverallDigest.getTopic()).thenReturn(null);
+        Mockito.when(mockFirstWeekOverallDigest.getStory()).thenReturn(mockFirstWeekOverallTopStory);
+
+        // Mocking that mockFirstWeekTopicDigest is a topic digest for mockTopic and mockSecondWeekTopicTopStory
+        Mockito.when(mockSecondWeekTopicDigest.getOverall()).thenReturn(false);
+        Mockito.when(mockSecondWeekTopicDigest.getTopic()).thenReturn(mockTopic);
+        Mockito.when(mockSecondWeekTopicDigest.getStory()).thenReturn(mockSecondWeekTopicTopStory);
+
+        // Mocking mockFirstWeekTopicTopStory contains FIRST_WEEK_TOPIC_TOP_STORY_TITLE, FIRST_WEEK_TOPIC_TOP_STORY_URL, FIRST_WEEK_TOPIC_TOP_STORY_SCORE
+        Mockito.when(mockFirstWeekTopicTopStory.getTitle()).thenReturn(FIRST_WEEK_TOPIC_TOP_STORY_TITLE);
+        Mockito.when(mockFirstWeekTopicTopStory.getUrl()).thenReturn(FIRST_WEEK_TOPIC_TOP_STORY_URL);
+        Mockito.when(mockFirstWeekTopicTopStory.getScore()).thenReturn(FIRST_WEEK_TOPIC_TOP_STORY_SCORE);
+
+        // Mocking mockFirstWeekOverallTopStory contains FIRST_WEEK_OVERALL_TOP_STORY_TITLE, FIRST_WEEK_OVERALL_TOP_STORY_URL, FIRST_WEEK_OVERALL_TOP_STORY_SCORE
+        Mockito.when(mockFirstWeekOverallTopStory.getTitle()).thenReturn(FIRST_WEEK_OVERALL_TOP_STORY_TITLE);
+        Mockito.when(mockFirstWeekOverallTopStory.getUrl()).thenReturn(FIRST_WEEK_OVERALL_TOP_STORY_URL);
+        Mockito.when(mockFirstWeekOverallTopStory.getScore()).thenReturn(FIRST_WEEK_OVERALL_TOP_STORY_SCORE);
+
+        // Mocking mockSecondWeekTopicTopStory contains SECOND_WEEK_TOPIC_TOP_STORY_TITLE, SECOND_WEEK_TOPIC_TOP_STORY_URL, SECOND_WEEK_TOPIC_TOP_STORY_SCORE
+        Mockito.when(mockSecondWeekTopicTopStory.getTitle()).thenReturn(SECOND_WEEK_TOPIC_TOP_STORY_TITLE);
+        Mockito.when(mockSecondWeekTopicTopStory.getUrl()).thenReturn(SECOND_WEEK_TOPIC_TOP_STORY_URL);
+        Mockito.when(mockSecondWeekTopicTopStory.getScore()).thenReturn(SECOND_WEEK_TOPIC_TOP_STORY_SCORE);
     }
 
 
@@ -222,6 +289,35 @@ public class UserControllerTest {
 
         // Verifying that mockStory is the top story for mockTopic
         Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, mockStory)), response.getBody());
+    }
+
+    @Test(expected = BusinessErrorException.class)
+    public void getDigests_userIdDoesNotMatchToken_throwsException() {
+
+        // Mocking that the request contains USER_ID
+        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
+
+        final Long differentUserId = USER_ID + 1;
+
+        userController.getDigests(mockRequest, differentUserId, DATE_RANGE_MODEL);
+    }
+
+    @Test
+    public void getDigests_userIdMatchesToken_delegateToUserService_digestsFound_returnsUserDigestsModel() {
+
+        // Mocking that the request contains USER_ID
+        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
+
+        // Mocking that mockStory is the top story for mockTopic
+        Mockito.when(userService.getDigests(USER_ID, DATE_RANGE_MODEL.getStart(), DATE_RANGE_MODEL.getEnd())).thenReturn(ImmutableMap.of(TWO_WEEKS_AGO, Arrays.asList(mockFirstWeekTopicDigest, mockFirstWeekOverallDigest), ONE_WEEK_AGO, Collections.singletonList(mockSecondWeekTopicDigest)));
+
+        final ResponseEntity<UserDigestsModel> response = userController.getDigests(mockRequest, USER_ID, DATE_RANGE_MODEL);
+
+        // Verifying that an attempt was made to retrieve the digests
+        Mockito.verify(userService).getDigests(USER_ID, DATE_RANGE_MODEL.getStart(), DATE_RANGE_MODEL.getEnd());
+
+        // Verifying that the userDigestsModel is returned
+        Assert.assertEquals(new UserDigestsModel(ImmutableMap.of(TWO_WEEKS_AGO, Arrays.asList(mockFirstWeekTopicDigest, mockFirstWeekOverallDigest), ONE_WEEK_AGO, Collections.singletonList(mockSecondWeekTopicDigest))), response.getBody());
     }
 
     private Set<String> sanitize(final Set<String> topics) {

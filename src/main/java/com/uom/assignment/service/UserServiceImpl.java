@@ -2,10 +2,7 @@ package com.uom.assignment.service;
 
 import com.uom.assignment.controller.BusinessError;
 import com.uom.assignment.controller.BusinessErrorException;
-import com.uom.assignment.dao.Story;
-import com.uom.assignment.dao.Topic;
-import com.uom.assignment.dao.User;
-import com.uom.assignment.dao.UserTopic;
+import com.uom.assignment.dao.*;
 import com.uom.assignment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,11 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,15 +27,22 @@ public class UserServiceImpl implements UserService {
     private final TopicService topicService;
     private final UserTopicService userTopicService;
     private final StoryService storyService;
+    private final DigestService digestService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(final UserRepository userRepository, final TopicService topicService, final UserTopicService userTopicService, final StoryService storyService, final PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserRepository userRepository, final TopicService topicService, final UserTopicService userTopicService, final StoryService storyService, final DigestService digestService, final PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.topicService = topicService;
         this.userTopicService = userTopicService;
         this.storyService = storyService;
+        this.digestService = digestService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -107,6 +108,15 @@ public class UserServiceImpl implements UserService {
                    .filter(UserTopic::isEffective)
                    .map(UserTopic::getTopic)
                    .collect(HashMap::new, (topStories, topic)-> topStories.put(topic, topic.getTopStory()), HashMap::putAll);
+    }
+
+    @Override
+    public Map<LocalDate, List<Digest>> getDigests(final Long id, final LocalDate start, final LocalDate end) {
+
+        final User user = Optional.ofNullable(userRepository.findOne(id))
+                .orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_USER));
+
+        return digestService.findDigests(user, start, end);
     }
 }
 

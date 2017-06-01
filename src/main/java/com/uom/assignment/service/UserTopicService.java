@@ -2,7 +2,9 @@ package com.uom.assignment.service;
 
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
+import com.uom.assignment.dao.UserTopic;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,5 +23,14 @@ public interface UserTopicService {
      * @param topics the {@link Set} of {@link Topic}s which the {@link User} wishes to subscribe to.
      */
     void subscribe(User user, Set<Topic> topics);
+
+    /**
+     * Retrieve the {@link Set} of effective {@link UserTopic}s for the given {@link UserTopic#topic}.
+     * An effective {@link UserTopic} is a {@link Topic} which the {@link User} is currently subscribed to.
+     *
+     * @param topic the {@link Topic} associated to the desired {@link UserTopic}s.
+     * @return a {@link Set} of effective {@link UserTopic}s for the given {@link UserTopic#topic}.
+     */
+    Set<UserTopic> findEffectiveByTopic(Topic topic);
 
 }

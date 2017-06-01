@@ -3,16 +3,22 @@ package com.uom.assignment.batch.writer;
 import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
+import com.uom.assignment.dao.User;
+import com.uom.assignment.model.request.CreateDigestModel;
 import com.uom.assignment.model.request.TopStoryModel;
 import com.uom.assignment.service.DigestService;
 import com.uom.assignment.service.DurationType;
+import com.uom.assignment.service.StoryService;
+import org.assertj.core.util.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -24,37 +30,70 @@ import java.util.Collections;
 public class CreateDigestWriterTest {
 
     @Mock
-    private Story mockStory;
+    private Story mockFirstStory;
 
     @Mock
-    private Topic mockTopic;
+    private Story mockSecondStory;
 
     @Mock
-    private Digest mockDigest;
+    private Topic mockFirstTopic;
 
     @Mock
-    private TopStoryModel mockTopStoryModel;
+    private Topic mockSecondTopic;
+
+    @Mock
+    private User mockFirstUser;
+
+    @Mock
+    private User mockSecondUser;
+
+    @Mock
+    private Digest mockFirstDigest;
+
+    @Mock
+    private Digest mockSecondDigest;
+
+    @Mock
+    private CreateDigestModel mockFirstCreateDigestModel;
+
+    @Mock
+    private CreateDigestModel mockSecondCreateDigestModel;
 
     @Mock
     private DigestService digestService;
+
+    @Mock
+    private StoryService storyService;
 
     @InjectMocks
     private CreateDigestWriter createDigestWriter;
 
     @Test
-    public void write_createsDigest() {
+    public void write_createsTopicDigest_createsOverallDigest() {
 
-        // Mocking mockUpdateTopStoriesModel to contain mockTopic and mockStory
-        Mockito.when(mockTopStoryModel.getTopic()).thenReturn(mockTopic);
-        Mockito.when(mockTopStoryModel.getStory()).thenReturn(mockStory);
+        // Mocking mockFirstTopicTopStoryModel to contain mockFirstTopic, mockFirstStory and mockFirstUser
+        Mockito.when(mockFirstCreateDigestModel.getTopic()).thenReturn(mockFirstTopic);
+        Mockito.when(mockFirstCreateDigestModel.getStory()).thenReturn(mockFirstStory);
+        Mockito.when(mockFirstCreateDigestModel.getUsers()).thenReturn(Collections.singleton(mockFirstUser));
 
-        // Mocking that the mockDigest is returned
-        Mockito.when(digestService.create(mockTopic, mockStory, DurationType.WEEKLY)).thenReturn(mockDigest);
+        // Mocking mockSecondTopicTopStoryModel to contain mockSecondTopic, mockSecondStory, mockFirstUser and mockSecondUser
+        Mockito.when(mockSecondCreateDigestModel.getTopic()).thenReturn(mockSecondTopic);
+        Mockito.when(mockSecondCreateDigestModel.getStory()).thenReturn(mockSecondStory);
+        Mockito.when(mockSecondCreateDigestModel.getUsers()).thenReturn(Sets.newLinkedHashSet(mockFirstUser, mockSecondUser));
 
-        createDigestWriter.write(Collections.singletonList(mockTopStoryModel));
+        // Mocking that the mockFirstDigest is returned
+        Mockito.when(digestService.createTopicDigest(mockFirstTopic, mockFirstStory, Collections.singleton(mockFirstUser), DurationType.WEEKLY)).thenReturn(mockFirstDigest);
 
-        // Verifying that a digest was created
-        Mockito.verify(digestService).create(mockTopic, mockStory, DurationType.WEEKLY);
+        // Mocking that the mockSecondDigest is returned
+        Mockito.when(digestService.createTopicDigest(mockSecondTopic, mockSecondStory, Sets.newLinkedHashSet(mockFirstUser, mockSecondUser), DurationType.WEEKLY)).thenReturn(mockSecondDigest);
+
+        createDigestWriter.write(Arrays.asList(Collections.singletonList(mockFirstCreateDigestModel), Collections.singletonList(mockSecondCreateDigestModel)));
+
+        // Verifying that a digest was created for mockFirstTopic, mockFirstStory and mockFirstUser
+        Mockito.verify(digestService).createTopicDigest(mockFirstTopic, mockFirstStory, Collections.singleton(mockFirstUser), DurationType.WEEKLY);
+
+        // Verifying that a digest was created for mockSecondTopic and mockSecondStory, mockFirstUser and mockSecondUser
+        Mockito.verify(digestService).createTopicDigest(mockSecondTopic, mockSecondStory, Sets.newLinkedHashSet(mockFirstUser, mockSecondUser), DurationType.WEEKLY);
     }
 
 }

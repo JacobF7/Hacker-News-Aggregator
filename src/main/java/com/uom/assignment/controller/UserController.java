@@ -1,14 +1,16 @@
 package com.uom.assignment.controller;
 
 import com.uom.assignment.aspect.AuthorizationHeader;
+import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
+import com.uom.assignment.model.request.DateRangeModel;
 import com.uom.assignment.model.request.TopicModel;
 import com.uom.assignment.model.request.UserModel;
 import com.uom.assignment.model.response.TopStoriesModel;
+import com.uom.assignment.model.response.UserDigestsModel;
 import com.uom.assignment.model.response.UserTopicModel;
-import com.uom.assignment.service.SessionService;
 import com.uom.assignment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -85,5 +89,21 @@ public class UserController {
         final TopStoriesModel topStoriesModel = new TopStoriesModel(topStories);
         return ResponseEntity.ok(topStoriesModel);
     }
+
+    @RequestMapping(value ="/{id}/digests", method = RequestMethod.POST)
+    public ResponseEntity<UserDigestsModel> getDigests(@AuthorizationHeader final HttpServletRequest request,
+                                                       @PathVariable final Long id,
+                                                       @Valid @RequestBody DateRangeModel dateRangeModel) {
+
+        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
+        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
+            throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
+        }
+
+        final Map<LocalDate, List<Digest>> digests = userService.getDigests(id, dateRangeModel.getStart(), dateRangeModel.getEnd());
+        final UserDigestsModel userDigestsModel = new UserDigestsModel(digests);
+        return ResponseEntity.ok(userDigestsModel);
+    }
+
 
 }

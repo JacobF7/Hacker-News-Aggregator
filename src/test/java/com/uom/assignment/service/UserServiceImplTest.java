@@ -1,10 +1,7 @@
 package com.uom.assignment.service;
 
 import com.uom.assignment.controller.BusinessErrorException;
-import com.uom.assignment.dao.Story;
-import com.uom.assignment.dao.Topic;
-import com.uom.assignment.dao.User;
-import com.uom.assignment.dao.UserTopic;
+import com.uom.assignment.dao.*;
 import com.uom.assignment.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,10 +14,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 
 /**
@@ -30,6 +25,9 @@ import java.util.Set;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
+
+    @Mock
+    private Digest mockDigest;
 
     @Mock
     private Topic mockTopic;
@@ -56,6 +54,9 @@ public class UserServiceImplTest {
     private StoryService storyService;
 
     @Mock
+    private DigestService digestService;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -65,6 +66,16 @@ public class UserServiceImplTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String TOPIC = "topic";
+
+    @Test
+    public void findAll_returnsUser() {
+
+        // Mocking mockUser exists
+        Mockito.when(userRepository.findAll()).thenReturn(Collections.singletonList(mockUser));
+
+        // Verifying that mockUser is returned
+        Assert.assertEquals(Collections.singletonList(mockUser), userService.findAll());
+    }
 
     @Test
     public void findByUsername_returnsUser() {
@@ -258,5 +269,38 @@ public class UserServiceImplTest {
 
         // Verifying that the top story for mockTopic is mockStory
         Assert.assertEquals(Collections.singletonMap(mockTopic, mockStory), topStories);
+    }
+
+    @Test(expected = BusinessErrorException.class)
+    public void getDigests_userIdDoesNotExist_throwsException() {
+
+        // Mocking that no User exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(null);
+
+        final LocalDate endDate = LocalDate.now(); // now
+        final LocalDate startDate = endDate.plusWeeks(-1L); // last week
+
+        userService.getDigests(USER_ID, startDate, endDate);
+    }
+
+    @Test
+    public void getDigests_userIdExists_returnsDigests() {
+
+        // Mocking that mockUser exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
+
+        final LocalDate endDate = LocalDate.now(); // now
+        final LocalDate startDate = endDate.plusWeeks(-1L); // last week
+
+        // Mocking that mockDigest is returned grouped by startDate
+        Mockito.when(digestService.findDigests(mockUser, startDate, endDate)).thenReturn(Collections.singletonMap(startDate, Collections.singletonList(mockDigest)));
+
+        final Map<LocalDate, List<Digest>> digests = userService.getDigests(USER_ID, startDate, endDate);
+
+        // Verifying that an attempt was made to get the digests
+        Mockito.verify(digestService).findDigests(mockUser, startDate, endDate);
+
+        // Verifying that mockDigest is returned
+        Assert.assertEquals(Collections.singletonMap(startDate, Collections.singletonList(mockDigest)), digests);
     }
 }

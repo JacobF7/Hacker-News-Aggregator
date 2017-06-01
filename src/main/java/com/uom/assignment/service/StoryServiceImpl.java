@@ -1,5 +1,6 @@
 package com.uom.assignment.service;
 
+import com.google.common.collect.Ordering;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.repository.StoryRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +11,10 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The {@link Service} implementation for the {@link Story} entity.
@@ -83,4 +87,19 @@ public class StoryServiceImpl implements StoryService {
                                                          .max(Comparator.comparing(Story::getScore));
     }
 
+    @Override
+    public List<Story> findOverallTopStoriesByCreationDate(final Duration duration, final int n) {
+        final List<Story> stories = findActiveByCreationDateDuration(duration).stream().filter(Story::isActive).collect(Collectors.toList());
+        return Ordering.from(Comparator.comparing(Story::getScore)).greatestOf(stories.iterator(), n);
+    }
+
+    @Override
+    public List<Story> findTopStoriesByTitleContainingAndCreationDate(final String topicName, final Duration duration, final int n) {
+
+        final Set<Story> stories = findActiveByCreationDateDuration(duration).stream()
+                .filter(Story::isActive)
+                .filter(story -> StringUtils.containsIgnoreCase(story.getTitle(), topicName)).collect(Collectors.toSet());
+
+        return Ordering.from(Comparator.comparing(Story::getScore)).greatestOf(stories.iterator(), n);
+    }
 }

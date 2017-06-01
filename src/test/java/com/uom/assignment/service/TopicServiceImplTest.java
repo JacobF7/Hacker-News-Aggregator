@@ -62,8 +62,8 @@ public class TopicServiceImplTest {
         // Mocking that there no Topic exists with TOPIC_NAME
         Mockito.when(topicRepository.findByName(TOPIC_NAME)).thenReturn(Optional.empty());
 
-        // Mocking that the top story for mockTopic is mockTopStory
-        Mockito.when(storyService.findTopStoryByTitleContaining(TOPIC_NAME)).thenReturn(Optional.of(mockTopStory));
+        // Mocking that the daily top story for mockTopic is mockTopStory
+        Mockito.when(storyService.findTopStoryByTitleContainingAndCreationDate(TOPIC_NAME, DurationType.DAILY.getDuration())).thenReturn(Optional.of(mockTopStory));
 
         // Mocking the persisted Topic
         final Topic savedTopic = new Topic(TOPIC_NAME, mockTopStory);
@@ -71,8 +71,8 @@ public class TopicServiceImplTest {
 
         final Topic topic = topicService.create(TOPIC_NAME);
 
-        // Verifying that an attempt was made to find the top story for mockTopic
-        Mockito.verify(storyService).findTopStoryByTitleContaining(TOPIC_NAME);
+        // Verifying that an attempt was made to find the daily top story for mockTopic
+        Mockito.verify(storyService).findTopStoryByTitleContainingAndCreationDate(TOPIC_NAME, DurationType.DAILY.getDuration());
 
         // Verifying that a new topic was saved with TOPIC_NAME
         final ArgumentCaptor<Topic> topicArgumentCaptor = ArgumentCaptor.forClass(Topic.class);

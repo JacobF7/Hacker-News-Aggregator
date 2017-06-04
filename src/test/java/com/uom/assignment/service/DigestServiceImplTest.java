@@ -233,6 +233,6 @@ public class DigestServiceImplTest {
 
     private long getExpiredCreationDate() {
         // Return the creationDate. This timestamp is expired by 1 year.
-        return LocalDateTime.now().minusYears(1).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return LocalDateTime.now().minusYears(1).atZone(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 }

@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -65,7 +66,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void handleMethodArgumentNotValid_responseContainsStatusCode_responseContainsErrorMessage() {
+    public void handleMethodArgumentNotValidException_responseContainsStatusCode_responseContainsErrorMessage() {
 
         final String object = "Object";
         final String field = "Field";
@@ -77,6 +78,27 @@ public class ExceptionMapperTest {
         Mockito.when(methodArgumentNotValidException.getBindingResult()).thenReturn(result);
 
         final ResponseEntity<Object> response = exceptionMapper.handleMethodArgumentNotValid(methodArgumentNotValidException, headers, HttpStatus.BAD_REQUEST, request);
+
+        // Verifying status code
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        // Verifying error message
+        Assert.assertTrue(response.getBody().toString().contains(error));
+    }
+
+    @Test
+    public void handleBindException_responseContainsStatusCode_responseContainsErrorMessage() {
+
+        final String object = "Object";
+        final String field = "Field";
+        final String error = "Validation Error";
+        final FieldError fieldError = new FieldError(object, field, error);
+        final BindException bindException = new BindException(result);
+
+        // Mocking a Field Error in the result of the bindException
+        Mockito.doReturn(Collections.singletonList(fieldError)).when(result).getFieldErrors();
+
+        final ResponseEntity<Object> response = exceptionMapper.handleBindException(bindException, headers, HttpStatus.BAD_REQUEST, request);
 
         // Verifying status code
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());

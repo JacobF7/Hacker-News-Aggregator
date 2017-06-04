@@ -92,7 +92,7 @@ public class UserController {
 
     @RequestMapping(value ="/{id}/digests/latest", method = RequestMethod.GET)
     public ResponseEntity<UserDigestsModel> getLatestDigests(@AuthorizationHeader final HttpServletRequest request,
-                                                       @PathVariable final Long id) {
+                                                             @PathVariable final Long id) {
 
         // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
         if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {

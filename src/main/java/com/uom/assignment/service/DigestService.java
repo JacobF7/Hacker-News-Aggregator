@@ -97,7 +97,7 @@ public interface DigestService {
      * @return the converted {@code date} as a {@link LocalDate}.
      */
     static LocalDate toLocalDate(final Long date) {
-        return Instant.ofEpochMilli(date).atZone(ZoneOffset.systemDefault()).toLocalDate();
+        return Instant.ofEpochMilli(date).atZone(ZoneOffset.UTC).toLocalDate();
     }
 
     /**
@@ -107,6 +107,6 @@ public interface DigestService {
      * @return the converted {@code date} in Epoch milliseconds.
      */
     static Long toEpoch(final LocalDate date) {
-        return date.atStartOfDay().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+        return date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 }

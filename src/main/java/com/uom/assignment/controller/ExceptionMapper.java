@@ -4,6 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -55,6 +56,23 @@ public class ExceptionMapper extends ResponseEntityExceptionHandler {
                                                                   final HttpStatus status,
                                                                   final WebRequest request) {
         logger.error(ex);
+        final List<FieldError> errors = ex.getBindingResult().getFieldErrors();
+        final Map<String, String> errorMessages = errors.stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+        return constructResponse(ex, request, HttpStatus.BAD_REQUEST, Collections.singletonMap(ERRORS, errorMessages));
+    }
+
+    /**
+     * An exception mapper to handle all {@link BindException}s which is thrown when validation on an argument annotated with {@code @Valid} fails.
+     *
+     * @param ex the {@link BindException}.
+     * @param headers the {@link HttpHeaders}.
+     * @param status the {@link HttpStatus}.
+     * @param request the {@link WebRequest}.
+     * @return a {@link ResponseEntity} containing all {@link FieldError}s in the {@link MethodArgumentNotValidException#getBindingResult}.
+     */
+    @Override
+    protected ResponseEntity<Object> handleBindException(final BindException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+        logger.error(ex.getMessage());
         final List<FieldError> errors = ex.getBindingResult().getFieldErrors();
         final Map<String, String> errorMessages = errors.stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
         return constructResponse(ex, request, HttpStatus.BAD_REQUEST, Collections.singletonMap(ERRORS, errorMessages));

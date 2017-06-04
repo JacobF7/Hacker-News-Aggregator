@@ -3,10 +3,14 @@ package com.uom.assignment.controller;
 import com.uom.assignment.aspect.AuthorizationHeader;
 import com.uom.assignment.model.request.DateRangeModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 
 /**
  * A Controller used for testing purposes.
@@ -24,8 +28,9 @@ public class TestController {
         throw new BusinessErrorException("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
-    public void testModelValidation(final @RequestBody @Valid DateRangeModel model) {}
+    @RequestMapping(value = "/model", method = RequestMethod.GET)
+    public void testModelValidation(final @Valid DateRangeModel model) {
+    }
 
     @RequestMapping(method = RequestMethod.PATCH)
     public String testRuntimeException() {

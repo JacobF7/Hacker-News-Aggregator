@@ -26,12 +26,40 @@ public class DateRangeValidatorTest {
     private static Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void isValid_effectiveFromAfterEffectiveTo_invalid_throwsException() {
+    public void isValid_startNull_invalid() {
 
-        // effectiveFrom occurs after effectiveTo
-        final LocalDate effectiveTo =  LocalDate.now();
-        final LocalDate effectiveFrom = effectiveTo.plusDays(1);
-        final DateRangeModel dateRangeModel = new DateRangeModel(effectiveFrom, effectiveTo);
+        // start is null
+        final LocalDate start =  null;
+        final LocalDate end = LocalDate.now();
+        final DateRangeModel dateRangeModel = new DateRangeModel(start, end);
+
+        final Set<ConstraintViolation<DateRangeModel>> constraintViolations = VALIDATOR.validate(dateRangeModel);
+
+        // Verifying that the error exists
+        Assert.assertFalse(constraintViolations.isEmpty());
+    }
+
+    @Test
+    public void isValid_endNull_invalid() {
+
+        // end is null
+        final LocalDate start =  LocalDate.now();
+        final LocalDate end = null;
+        final DateRangeModel dateRangeModel = new DateRangeModel(start, end);
+
+        final Set<ConstraintViolation<DateRangeModel>> constraintViolations = VALIDATOR.validate(dateRangeModel);
+
+        // Verifying that the error exists
+        Assert.assertFalse(constraintViolations.isEmpty());
+    }
+
+    @Test
+    public void isValid_startAfterEnd_invalid() {
+
+        // start occurs after end
+        final LocalDate end =  LocalDate.now();
+        final LocalDate start = end.plusDays(1);
+        final DateRangeModel dateRangeModel = new DateRangeModel(start, end);
 
         final Set<ConstraintViolation<DateRangeModel>> constraintViolations = VALIDATOR.validate(dateRangeModel);
 
@@ -43,10 +71,10 @@ public class DateRangeValidatorTest {
     @Test
     public void isValid_effectiveFromBeforeEffectiveTo_valid() {
 
-        // effectiveFrom occurs after effectiveTo
-        final LocalDate effectiveFrom =  LocalDate.now();
-        final LocalDate effectiveTo = effectiveFrom.plusDays(1);
-        final DateRangeModel dateRangeModel = new DateRangeModel(effectiveFrom, effectiveTo);
+        // end occurs after start
+        final LocalDate start =  LocalDate.now();
+        final LocalDate end = start.plusDays(1);
+        final DateRangeModel dateRangeModel = new DateRangeModel(start, end);
 
         final Set<ConstraintViolation<DateRangeModel>> constraintViolations = VALIDATOR.validate(dateRangeModel);
 

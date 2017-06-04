@@ -7,10 +7,7 @@ import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A service containing all {@link User} related operations.
@@ -85,6 +82,19 @@ public interface UserService {
      * @param start the start {@link LocalDate}.
      * @param end the end {@link LocalDate}.
      * @return a {@link Map} of {@link Digest}s grouped by {@link Digest#creationDate}.
+     * @throws BusinessErrorException when the specified {@code id} does not belong to any {@link User}.
      */
     Map<LocalDate, List<Digest>> getDigests(Long id, LocalDate start, LocalDate end);
+
+    /**
+     * Retrieve a set of the most recent {@link Digest}s.
+     * Note that the returned {@link Digest}s must either be:
+     *          a) An {@link Digest#overall} {@link Digest} or
+     *          b) The {@link Digest#topic} is contained in {@link User#getUserTopics()}}.
+     *
+     * @param id the {@link User#id} of the {@link User} for which the {@link Digest}s are to be retrieved.
+     * @return a {@link Collections#singletonMap} of the {@link Digest}s for a particular {@link Digest#creationDate}.
+     * @throws BusinessErrorException when the specified {@code id} does not belong to any {@link User}.
+     */
+    Map<LocalDate, List<Digest>> getLatestDigests(Long id);
 }

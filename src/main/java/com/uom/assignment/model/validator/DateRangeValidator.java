@@ -22,7 +22,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, DateRa
 
         if(model.getStart().isAfter(model.getEnd())){
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Effective From cannot occur after Effective To").addPropertyNode("effectiveFrom").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Start Date cannot occur after End Date").addPropertyNode("start").addConstraintViolation();
             return false;
         }
 

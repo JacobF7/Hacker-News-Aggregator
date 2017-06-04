@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.backoff.BackOffPolicy;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ public class CreateDigestStep {
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Value("${batch.new.stories.chunk}")
+    @Value("${batch.step.chunk.size}")
     private int chunk;
 
     @Autowired

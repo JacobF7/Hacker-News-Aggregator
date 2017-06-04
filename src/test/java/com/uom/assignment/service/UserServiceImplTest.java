@@ -278,7 +278,7 @@ public class UserServiceImplTest {
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(null);
 
         final LocalDate endDate = LocalDate.now(); // now
-        final LocalDate startDate = endDate.plusWeeks(-1L); // last week
+        final LocalDate startDate = endDate.minusWeeks(1L); // last week
 
         userService.getDigests(USER_ID, startDate, endDate);
     }
@@ -290,7 +290,7 @@ public class UserServiceImplTest {
         Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
 
         final LocalDate endDate = LocalDate.now(); // now
-        final LocalDate startDate = endDate.plusWeeks(-1L); // last week
+        final LocalDate startDate = endDate.minusWeeks(1L); // last week
 
         // Mocking that mockDigest is returned grouped by startDate
         Mockito.when(digestService.findDigests(mockUser, startDate, endDate)).thenReturn(Collections.singletonMap(startDate, Collections.singletonList(mockDigest)));
@@ -302,5 +302,34 @@ public class UserServiceImplTest {
 
         // Verifying that mockDigest is returned
         Assert.assertEquals(Collections.singletonMap(startDate, Collections.singletonList(mockDigest)), digests);
+    }
+
+    @Test(expected = BusinessErrorException.class)
+    public void getLatestDigests_userIdDoesNotExist_throwsException() {
+
+        // Mocking that no User exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(null);
+
+        userService.getLatestDigests(USER_ID);
+    }
+
+    @Test
+    public void getLatestDigests_userIdExists_returnsDigests() {
+
+        // Mocking that mockUser exists with USER_ID
+        Mockito.when(userRepository.findOne(USER_ID)).thenReturn(mockUser);
+
+        final LocalDate latestDate = LocalDate.now().minusWeeks(1L); // 1 week ago
+
+        // Mocking that mockDigest is returned for latestDate
+        Mockito.when(digestService.findLatestDigests(mockUser)).thenReturn(Collections.singletonMap(latestDate, Collections.singletonList(mockDigest)));
+
+        final Map<LocalDate, List<Digest>> digests = userService.getLatestDigests(USER_ID);
+
+        // Verifying that an attempt was made to get the latest digests
+        Mockito.verify(digestService).findLatestDigests(mockUser);
+
+        // Verifying that mockDigest is returned
+        Assert.assertEquals(Collections.singletonMap(latestDate, Collections.singletonList(mockDigest)), digests);
     }
 }

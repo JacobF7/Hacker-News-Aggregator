@@ -24,14 +24,14 @@ public class Digest {
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "top_story_id")
     private Story story;
 
     @Column(name = "creation_date")
     private Long creationDate;
 
-    @ManyToMany(cascade = CascadeType.MERGE) // TODO CONFIRM CASCADE TYPE
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "user_digest",
                joinColumns = @JoinColumn(name = "digest_id"),
                inverseJoinColumns = @JoinColumn(name = "user_id"))

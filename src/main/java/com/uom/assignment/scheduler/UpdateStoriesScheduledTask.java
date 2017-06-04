@@ -3,6 +3,7 @@ package com.uom.assignment.scheduler;
 import com.google.common.collect.ImmutableMap;
 import com.uom.assignment.batch.job.UpdateStoriesJob;
 import com.uom.assignment.batch.reader.FetchMode;
+import com.uom.assignment.cache.CacheConfiguration;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -36,13 +38,15 @@ public class UpdateStoriesScheduledTask {
         this.job = job;
     }
 
-    //@Scheduled(fixedDelay = 1_800_000) //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight // TODO DONT FORGET THIS
-    @Scheduled(fixedDelay = 1_800_000, initialDelay = 60_000)
+    //@Scheduled(fixedDelay = 1_800_000, initialDelay = 100000)
+    //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight TODO UNCOMMENT
+    @CacheEvict(value = {CacheConfiguration.TOP_STORIES_CACHE_KEY, CacheConfiguration.TOPICS_CACHE_KEY}, allEntries = true)
     public void updateAllStories() {
         updateStories(FetchMode.ALL);
     }
 
-    //@Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds
+   // @Scheduled(fixedDelay = 3_600_000, initialDelay = 100_000) // 1 Hour = 3,600,000 Milliseconds TODO UNCOMMENT
+    @CacheEvict(value = {CacheConfiguration.TOP_STORIES_CACHE_KEY, CacheConfiguration.TOPICS_CACHE_KEY}, allEntries = true)
     public void updateRecentStories() {
         updateStories(FetchMode.RECENT);
     }

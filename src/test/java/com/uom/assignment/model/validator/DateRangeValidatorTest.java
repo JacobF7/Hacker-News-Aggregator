@@ -23,12 +23,6 @@ import java.util.Set;
 @RunWith(MockitoJUnitRunner.class)
 public class DateRangeValidatorTest {
 
-    @Mock
-    private StoryService storyService;
-
-    @InjectMocks
-    private DateRangeValidator dateRangeValidator;
-
     private static Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
@@ -43,7 +37,7 @@ public class DateRangeValidatorTest {
 
         // Verifying that the error exists
         Assert.assertFalse(constraintViolations.isEmpty());
-        Assert.assertEquals("Effective From cannot occur after Effective To", constraintViolations.iterator().next().getMessage());
+        Assert.assertEquals("Start Date cannot occur after End Date", constraintViolations.iterator().next().getMessage());
     }
 
     @Test

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+
 /**
  * The {@link Configuration} for the Update Stories Step, which serves to update every persisted {@link Story}.
  * Note that a {@link Story} can only be updated if it is not {@link Story#deleted}.
@@ -25,8 +27,11 @@ public class UpdateStoriesStep {
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Value("${batch.update.stories.chunk}")
+    @Value("${batch.step.chunk.size}")
     private int chunk;
+
+    @Value("${batch.step.retry.limit}")
+    private int retry;
 
     @Autowired
     public UpdateStoriesStep(final StepBuilderFactory stepBuilderFactory) {
@@ -41,6 +46,9 @@ public class UpdateStoriesStep {
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant()
+                .retry(IOException.class)
+                .retryLimit(retry)
                 .build();
     }
 

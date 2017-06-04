@@ -230,7 +230,7 @@ public class SessionServiceImplTest {
     }
 
     @Test
-    public void deleteExpiredSessionsScheduledTask_expiredSessionExists_expiredSessionDeleted() {
+    public void deleteExpiredSessions_expiredSessionExists_expiredSessionDeleted() {
 
         // Mocking all sessions stored in database, i.e. mockSession
         Mockito.when(sessionRepository.findAll()).thenReturn(Collections.singletonList(mockSession));
@@ -240,11 +240,12 @@ public class SessionServiceImplTest {
 
         sessionService.deleteExpiredSessions();
 
+        // Verifying that mockSession was deleted
         Mockito.verify(sessionRepository).delete(mockSession.getId());
     }
 
     @Test
-    public void deleteExpiredSessionsScheduledTask_expiredSessionDoesNotExist_doesNothing() {
+    public void deleteExpiredSessions_expiredSessionDoesNotExist_doesNothing() {
 
         // Mocking all sessions stored in database, i.e. mockSession
         Mockito.when(sessionRepository.findAll()).thenReturn(Collections.singletonList(mockSession));
@@ -254,6 +255,7 @@ public class SessionServiceImplTest {
 
         sessionService.deleteExpiredSessions();
 
+        // Verifying that mockSession was NOT deleted
         Mockito.verify(sessionRepository, Mockito.never()).delete(mockSession.getId());
     }
 

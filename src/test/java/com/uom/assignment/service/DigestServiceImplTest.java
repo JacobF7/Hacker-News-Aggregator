@@ -9,18 +9,12 @@ import com.uom.assignment.repository.DigestRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * A test suite for {@link DigestService}.
@@ -40,6 +34,9 @@ public class DigestServiceImplTest {
     private User mockUser;
 
     @Mock
+    private Digest mockDigest;
+
+    @Mock
     private Digest mockFirstWeekFirstDigest;
 
     @Mock
@@ -55,9 +52,10 @@ public class DigestServiceImplTest {
     private DigestServiceImpl digestService;
 
     private static final String TOPIC_NAME = "topic";
+    private static final Long DIGEST_ID = new Random().nextLong();
 
-    private final LocalDate TWO_WEEKS_AGO = LocalDate.now().plusWeeks(-2L); // two weeks ago
-    private final LocalDate ONE_WEEK_AGO = LocalDate.now().plusWeeks(-1L); // one week ago
+    private static final LocalDate TWO_WEEKS_AGO = LocalDate.now().minusWeeks(2L); // two weeks ago
+    private static final LocalDate ONE_WEEK_AGO = LocalDate.now().minusWeeks(1L); // one week ago
 
     @Test
     public void createTopicDigest_persistsDigest() {
@@ -115,30 +113,30 @@ public class DigestServiceImplTest {
     public void getDigests_returnsDigests() {
 
         final LocalDate endDate = LocalDate.now(); // now
-        final LocalDate startDate = endDate.plusWeeks(-2L); // two weeks ago
+        final LocalDate startDate = endDate.minusWeeks(2L); // two weeks ago
 
         // Mocking that mockFirstWeekFirstDigest occurred TWO_WEEKS_AGO for mockUser
-        Mockito.when(mockFirstWeekFirstDigest.getCreationDate()).thenReturn(toEpoch(TWO_WEEKS_AGO));
+        Mockito.when(mockFirstWeekFirstDigest.getCreationDate()).thenReturn(DigestService.toEpoch(TWO_WEEKS_AGO));
         Mockito.when(mockFirstWeekFirstDigest.getOverall()).thenReturn(false);
         Mockito.when(mockFirstWeekFirstDigest.getUsers()).thenReturn(Collections.singleton(mockUser));
 
         // Mocking that mockFirstWeekSecondDigest occurred TWO_WEEKS_AGO for mockUser
-        Mockito.when(mockFirstWeekSecondDigest.getCreationDate()).thenReturn(toEpoch(TWO_WEEKS_AGO));
+        Mockito.when(mockFirstWeekSecondDigest.getCreationDate()).thenReturn(DigestService.toEpoch(TWO_WEEKS_AGO));
         Mockito.when(mockFirstWeekSecondDigest.getOverall()).thenReturn(false);
         Mockito.when(mockFirstWeekSecondDigest.getUsers()).thenReturn(Collections.singleton(mockUser));
 
         // Mocking that mockSecondWeekFirstDigest occurred ONE_WEEK_AGO and is an overall digest for mockUser
-        Mockito.when(mockSecondWeekFirstDigest.getCreationDate()).thenReturn(toEpoch(ONE_WEEK_AGO));
+        Mockito.when(mockSecondWeekFirstDigest.getCreationDate()).thenReturn(DigestService.toEpoch(ONE_WEEK_AGO));
         Mockito.when(mockSecondWeekFirstDigest.getOverall()).thenReturn(true);
         Mockito.when(mockSecondWeekFirstDigest.getUsers()).thenReturn(Collections.singleton(mockUser));
 
         // Mocking that mockFirstWeekFirstDigest, mockFirstWeekSecondDigest and mockSecondWeekDigest are returned
-        Mockito.when(digestRepository.findByUsersAndCreationDateBetween(mockUser, toEpoch(startDate), toEpoch(endDate))).thenReturn(Sets.newHashSet(mockFirstWeekFirstDigest, mockFirstWeekSecondDigest, mockSecondWeekFirstDigest));
+        Mockito.when(digestRepository.findByUsersAndCreationDateBetween(mockUser, DigestService.toEpoch(startDate), DigestService.toEpoch(endDate))).thenReturn(Sets.newHashSet(mockFirstWeekFirstDigest, mockFirstWeekSecondDigest, mockSecondWeekFirstDigest));
 
         final Map<LocalDate, List<Digest>> digests = digestService.findDigests(mockUser, startDate, endDate);
 
         // Verifying that an attempt was made to retrieve the digests was created
-        Mockito.verify(digestRepository).findByUsersAndCreationDateBetween(mockUser, toEpoch(startDate), toEpoch(endDate));
+        Mockito.verify(digestRepository).findByUsersAndCreationDateBetween(mockUser, DigestService.toEpoch(startDate), DigestService.toEpoch(endDate));
 
         // Verifying that the digests were grouped by TWO_WEEKS_AGO and ONE_WEEK_AGO
         Assert.assertEquals(2, digests.size());
@@ -150,7 +148,91 @@ public class DigestServiceImplTest {
         Assert.assertTrue(digests.get(ONE_WEEK_AGO).containsAll(Collections.singletonList(mockSecondWeekFirstDigest)));
     }
 
-    private Long toEpoch(final LocalDate date) {
-        return date.atStartOfDay().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+    @Test
+    public void getLatestDigests_digestDoesNotExist_returnsEmptyMap() {
+
+        // Mocking that the latest digest does not exist since the most recent digest creation date for mockUser cannot be retrieved
+        Mockito.when(digestRepository.findMaxCreationDateByUser(mockUser)).thenReturn(null);
+
+        final Map<LocalDate, List<Digest>> digests = digestService.findLatestDigests(mockUser);
+
+        // Verifying that an attempt was made to retrieve the date of the most recent digest creation date for mockUser
+        Mockito.verify(digestRepository).findMaxCreationDateByUser(mockUser);
+
+        // Verifying that an attempt was NOT made to retrieve the digests by user and most recent digest creation date
+        Mockito.verify(digestRepository, Mockito.never()).findByUsersAndCreationDate(Matchers.eq(mockUser), Matchers.any());
+
+        // Verifying that an empty map was returned
+        Assert.assertEquals(Collections.emptyMap(), digests);
+    }
+
+    @Test
+    public void getLatestDigests_returnsLatestDigests() {
+
+        // Mocking that mockFirstWeekSecondDigest occurred ONE_WEEK_AGO for mockUser
+        Mockito.when(mockSecondWeekFirstDigest.getCreationDate()).thenReturn(DigestService.toEpoch(ONE_WEEK_AGO));
+        Mockito.when(mockSecondWeekFirstDigest.getOverall()).thenReturn(true);
+        Mockito.when(mockSecondWeekFirstDigest.getUsers()).thenReturn(Collections.singleton(mockUser));
+
+        // Mocking that the latest digest for mockUser was created on ONE_WEEK_AGO
+        Mockito.when(digestRepository.findMaxCreationDateByUser(mockUser)).thenReturn(DigestService.toEpoch(ONE_WEEK_AGO));
+
+        // Mocking that the latest digest for mockUser is mockSecondWeekFirstDigest
+        Mockito.when(digestRepository.findByUsersAndCreationDate(mockUser, DigestService.toEpoch(ONE_WEEK_AGO))).thenReturn(Collections.singleton(mockSecondWeekFirstDigest));
+
+        final Map<LocalDate, List<Digest>> digests = digestService.findLatestDigests(mockUser);
+
+        // Verifying that an attempt was made to retrieve the date of the most recent digest creation date for mockUser
+        Mockito.verify(digestRepository).findMaxCreationDateByUser(mockUser);
+
+        // Verifying that an attempt was made to retrieve the digests by user and most recent digest creation date, i.e. ONE_WEEK_AGO
+        Mockito.verify(digestRepository).findByUsersAndCreationDate(mockUser, DigestService.toEpoch(ONE_WEEK_AGO));
+
+        // Verifying that the digests were grouped by ONE_WEEK_AGO only
+        Assert.assertEquals(1, digests.size());
+
+        // Verifying that the digest for ONE_WEEK_AGO contains mockSecondWeekFirstDigest
+        Assert.assertTrue(digests.get(ONE_WEEK_AGO).containsAll(Collections.singletonList(mockSecondWeekFirstDigest)));
+    }
+
+    @Test
+    public void deleteExpiredDigests_expiredDigestExists_expiredDigestDeleted() {
+
+        // Mocking that mockDigest contains DIGEST_ID
+        Mockito.when(mockDigest.getId()).thenReturn(DIGEST_ID);
+
+        // Mocking all digests stored in database, i.e. mockDigest
+        Mockito.when(digestRepository.findAll()).thenReturn(Collections.singletonList(mockDigest));
+
+        // Mock creationDate as 1 year ago, i.e. mockDigest is expired.
+        Mockito.when(mockDigest.getCreationDate()).thenReturn(getExpiredCreationDate());
+
+        digestService.deleteExpiredDigests();
+
+        // Verifying that mockDigest was deleted
+        Mockito.verify(digestRepository).delete(mockDigest.getId());
+    }
+
+    @Test
+    public void deleteExpiredDigests_expiredDigestDoesNotExist_doesNothing() {
+
+        // Mocking that mockDigest contains DIGEST_ID
+        Mockito.when(mockDigest.getId()).thenReturn(DIGEST_ID);
+
+        // Mocking all digests stored in database, i.e. mockDigest
+        Mockito.when(digestRepository.findAll()).thenReturn(Collections.singletonList(mockDigest));
+
+        // Mock lastActivity as now, i.e. mockSession is not expired.
+        Mockito.when(mockDigest.getCreationDate()).thenReturn(System.currentTimeMillis());
+
+        digestService.deleteExpiredDigests();
+
+        // Verifying that mockDigest was NOT deleted
+        Mockito.verify(digestRepository, Mockito.never()).delete(mockDigest.getId());
+    }
+
+    private long getExpiredCreationDate() {
+        // Return the creationDate. This timestamp is expired by 1 year.
+        return LocalDateTime.now().minusYears(1).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

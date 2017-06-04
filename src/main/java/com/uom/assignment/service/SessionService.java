@@ -1,18 +1,15 @@
 package com.uom.assignment.service;
 
 import com.uom.assignment.aspect.AuthenticationAspect;
-import com.uom.assignment.aspect.AuthorizationHeader;
 import com.uom.assignment.controller.BusinessErrorException;
 import com.uom.assignment.dao.Session;
 import com.uom.assignment.dao.User;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.System.currentTimeMillis;
-import static java.time.Duration.between;
 import static java.time.Instant.ofEpochMilli;
 
 /**
@@ -79,28 +76,28 @@ public interface SessionService {
     void refresh(Session session);
 
     /**
-     * Deletes any expired {@link Session}, i.e. any {@link Session}
+     * Deletes any expired {@link Session}, i.e. any {@link Session} where the duration between now and {@link Session#lastActivity} is longer than the default {@link Session} expiration time.
      *
      * @return a {@link Set} of {@link Session#id} for every expired {@link Session} that is deleted.
      */
     Set<Long> deleteExpiredSessions();
 
     /**
-     * Determines whether the given {@link Session} is expired, i.e. the duration between now and {@link Session#lastActivity} is longer than the default session expiration time.
+     * Determines whether the given {@link Session} is expired, i.e. the duration between now and {@link Session#lastActivity} is longer than the default {@link Session} expiration time.
      *
      * @param session the {@link Session} to check for expiration.
      * @return true if the given {@link Session} is expired, false otherwise.
      */
     static boolean isSessionExpired(Session session) {
-        return between(ofEpochMilli(session.getLastActivity()),
-                       ofEpochMilli(currentTimeMillis())).toMillis() > Duration.ofMinutes(30L).toMillis();
+        return Duration.between(ofEpochMilli(session.getLastActivity()),
+                                ofEpochMilli(currentTimeMillis())).toMillis() > getSessionExpiryTime();
     }
 
     /**
-     * Determines whether the given {@link Session} is active, i.e. the duration between now and {@link Session#lastActivity} is NOT longer than the default session expiration time.
+     * Determines whether the given {@link Session} is active, i.e. the duration between now and {@link Session#lastActivity} is NOT longer than the default {@link Session}  expiration time.
      *
-     * @param session the {@link Session} to check for expiration.
-     * @return true if the given {@link Session} is expired, false otherwise.
+     * @param session the {@link Session} to check if it is currently active.
+     * @return true if the given {@link Session} is active, false otherwise.
      */
     static boolean isSessionActive(Session session) {
         return !isSessionExpired(session);

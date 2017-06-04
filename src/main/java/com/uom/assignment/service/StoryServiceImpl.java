@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -102,4 +99,14 @@ public class StoryServiceImpl implements StoryService {
 
         return Ordering.from(Comparator.comparing(Story::getScore)).greatestOf(stories.iterator(), n);
     }
+
+    @Override
+    public Set<Long> deleteUnusedStoriesByCreationDate(final Duration duration) {
+        final Set<Long> stories = storyRepository.findUnusedByCreationDate(System.currentTimeMillis() - duration.toMillis()).stream().map(Story::getId).collect(Collectors.toSet());
+
+        stories.forEach(storyRepository::delete);
+
+        return stories;
+    }
+
 }

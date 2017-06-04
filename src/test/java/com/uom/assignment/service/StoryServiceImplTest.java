@@ -47,6 +47,7 @@ public class StoryServiceImplTest {
     private static final Long AVERAGE_SCORE = 5L;
     private static final Long TOP_SCORE = 10L;
     private static final Long CREATION_DATE = RANDOM.nextLong();
+    private static final Long STORY_ID = RANDOM.nextLong();
 
     @Test
     public void findByHackerNewsId_returnsStory() {
@@ -515,6 +516,36 @@ public class StoryServiceImplTest {
 
         // Verifying that mockStory were the returned top stories
         Assert.assertEquals(Collections.singletonList(mockStory), topStories);
+    }
+
+    @Test
+    public void deleteUnusedStoriesByCreationDate_unusedDigestExists_unusedDigestDeleted() {
+
+        // Mocking that mockStory contains STORY_ID
+        Mockito.when(mockStory.getId()).thenReturn(STORY_ID);
+
+        // Mocking all unused in database, i.e. mockStory
+        Mockito.when(storyRepository.findUnusedByCreationDate(Matchers.anyLong())).thenReturn(Collections.singletonList(mockStory));
+
+        storyService.deleteUnusedStoriesByCreationDate(DurationType.WEEKLY.getDuration());
+
+        // Verifying that mockStory was deleted
+        Mockito.verify(storyRepository).delete(mockStory.getId());
+    }
+
+    @Test
+    public void deleteUnusedStoriesByCreationDate_unusedDigestDoesNotExist_doesNothing() {
+
+        // Mocking that mockStory contains STORY_ID
+        Mockito.when(mockStory.getId()).thenReturn(STORY_ID);
+
+        // Mocking that there are no unused stories in database
+        Mockito.when(storyRepository.findUnusedByCreationDate(Matchers.anyLong())).thenReturn(Collections.emptyList());
+
+        storyService.deleteUnusedStoriesByCreationDate(DurationType.WEEKLY.getDuration());
+
+        // Verifying that mockStory was NOT deleted
+        Mockito.verify(storyRepository, Mockito.never()).delete(mockStory.getId());
     }
 
 }

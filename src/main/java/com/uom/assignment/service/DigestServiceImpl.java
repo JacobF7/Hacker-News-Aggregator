@@ -1,22 +1,24 @@
 package com.uom.assignment.service;
 
+import com.uom.assignment.cache.CacheConfiguration;
 import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
 import com.uom.assignment.repository.DigestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class DigestServiceImpl implements DigestService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DigestServiceImpl.class);
 
     private final DigestRepository digestRepository;
 
@@ -50,20 +54,48 @@ public class DigestServiceImpl implements DigestService {
     public Map<LocalDate, List<Digest>> findDigests(final User user, final LocalDate start, final LocalDate end) {
 
         final Set<Digest> digests =
-            digestRepository.findByUsersAndCreationDateBetween(user, toEpoch(start), toEpoch(end));
+            digestRepository.findByUsersAndCreationDateBetween(user, DigestService.toEpoch(start), DigestService.toEpoch(end));
 
         return digests.stream()
                       .collect(Collectors.groupingBy(Digest::getCreationDate))
                       .entrySet()
                       .stream()
-                      .collect(Collectors.toMap(entry -> toLocalDate(entry.getKey()), Map.Entry::getValue));
+                      .collect(Collectors.toMap(entry -> DigestService.toLocalDate(entry.getKey()), Map.Entry::getValue));
     }
 
-    private Long toEpoch(final LocalDate date) {
-        return date.atStartOfDay().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+    @Cacheable(value = CacheConfiguration.LATEST_DIGESTS_CACHE_KEY, key = "#user.getId()")
+    @Override
+    public Map<LocalDate, List<Digest>> findLatestDigests(final User user) {
+
+        LOG.info("Bypassing {} Cache for Key: [{}] ", CacheConfiguration.LATEST_DIGESTS_CACHE_KEY, user.getId());
+
+        final Optional<Long> latestCreationDate = Optional.ofNullable(digestRepository.findMaxCreationDateByUser(user));
+
+        if (!latestCreationDate.isPresent()) {
+            return Collections.emptyMap();
+        }
+
+        final Set<Digest> digests = digestRepository.findByUsersAndCreationDate(user, latestCreationDate.get());
+
+        return digests.stream()
+                .collect(Collectors.groupingBy(Digest::getCreationDate))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> DigestService.toLocalDate(entry.getKey()), Map.Entry::getValue));
     }
 
-    private LocalDate toLocalDate(final Long date) {
-       return Instant.ofEpochMilli(date).atZone(ZoneOffset.systemDefault()).toLocalDate();
+    @Override
+    public Set<Long> deleteExpiredDigests() {
+
+        final Set<Long> expiredDigests = digestRepository.findAll()
+                .parallelStream()
+                .filter(DigestService::isDigestExpired)
+                .map(Digest::getId)
+                .collect(Collectors.toSet());
+
+        expiredDigests.forEach(digestRepository::delete);
+
+        return expiredDigests;
     }
+
 }

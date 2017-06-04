@@ -4,6 +4,7 @@ package com.uom.assignment.dao;
 import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -38,6 +39,9 @@ public class Story {
 
     @Column(name = "creation_date")
     private Long creationDate;
+
+    @OneToMany(mappedBy = "story")
+    private List<Digest> digests;
 
     public Story() {
         // Needed by Hibernate
@@ -127,6 +131,14 @@ public class Story {
 
     public void setCreationDate(final Long creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public List<Digest> getDigests() {
+        return digests;
+    }
+
+    public void setDigests(final List<Digest> digests) {
+        this.digests = digests;
     }
 
     @Override

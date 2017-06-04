@@ -35,7 +35,7 @@ public class ExceptionMapper extends ResponseEntityExceptionHandler {
      * @return a {@link ResponseEntity} containing the {@link BusinessErrorException#getMessage()}.
      */
     @ExceptionHandler(BusinessErrorException.class)
-    public ResponseEntity<Object> handleBusinessErrorException(final BusinessErrorException ex, final WebRequest request ) {
+    public ResponseEntity<Object> handleBusinessErrorException(final BusinessErrorException ex, final WebRequest request) {
         logger.error(ex);
         return constructResponse(ex, request, ex.getStatusCode(), Collections.singletonMap(ERROR, ex.getMessage()));
     }

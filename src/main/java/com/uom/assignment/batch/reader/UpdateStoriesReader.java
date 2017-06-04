@@ -30,7 +30,7 @@ public class UpdateStoriesReader implements ItemReader<Story> {
     @Autowired
     public UpdateStoriesReader(final StoryService storyService,
                                @Value("#{jobParameters[T(com.uom.assignment.batch.reader.FetchMode).FETCH_MODE]}") final FetchMode fetchMode,
-                               @Value("${recent.update.duration.hours}") int duration) {
+                               @Value("${story.recent.duration.hours}") int duration) {
 
         LOG.info("Reading [{}] Stories from Database", fetchMode);
 
@@ -50,7 +50,7 @@ public class UpdateStoriesReader implements ItemReader<Story> {
     }
 
     @Override
-    public Story read() throws Exception {
+    public Story read() {
         return stories.isEmpty() ? null : stories.remove(0);
     }
 

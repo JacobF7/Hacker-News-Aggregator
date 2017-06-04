@@ -48,7 +48,7 @@ public class NewStoriesReader implements ItemReader<StoryIdModel> {
     }
 
     @Override
-    public StoryIdModel read() throws Exception {
+    public StoryIdModel read() {
         return newStories.isEmpty() ? null : newStories.remove(0);
     }
 }

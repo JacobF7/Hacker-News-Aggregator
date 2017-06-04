@@ -90,10 +90,10 @@ public class UserController {
         return ResponseEntity.ok(topStoriesModel);
     }
 
-    @RequestMapping(value ="/{id}/digests", method = RequestMethod.POST)
+    @RequestMapping(value ="/{id}/digests", method = RequestMethod.GET)
     public ResponseEntity<UserDigestsModel> getDigests(@AuthorizationHeader final HttpServletRequest request,
                                                        @PathVariable final Long id,
-                                                       @Valid @RequestBody DateRangeModel dateRangeModel) {
+                                                       @Valid final DateRangeModel dateRangeModel) {
 
         // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
         if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
@@ -105,5 +105,17 @@ public class UserController {
         return ResponseEntity.ok(userDigestsModel);
     }
 
+    @RequestMapping(value ="/{id}/digests/latest", method = RequestMethod.GET)
+    public ResponseEntity<UserDigestsModel> getLatestDigests(@AuthorizationHeader final HttpServletRequest request,
+                                                       @PathVariable final Long id) {
 
+        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
+        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
+            throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
+        }
+
+        final Map<LocalDate, List<Digest>> digests = userService.getLatestDigests(id);
+        final UserDigestsModel userDigestsModel = new UserDigestsModel(digests);
+        return ResponseEntity.ok(userDigestsModel);
+    }
 }

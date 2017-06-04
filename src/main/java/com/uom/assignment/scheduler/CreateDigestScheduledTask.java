@@ -1,6 +1,7 @@
 package com.uom.assignment.scheduler;
 
 import com.uom.assignment.batch.job.CreateDigestJob;
+import com.uom.assignment.cache.CacheConfiguration;
 import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
@@ -17,6 +18,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -55,8 +57,9 @@ public class CreateDigestScheduledTask {
         this.job = job;
     }
 
-   // @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds // TODO CRON
-    @Scheduled(fixedDelay = 1_800_000, initialDelay = 400_000)
+    // @Scheduled(fixedDelay = 1_800_000, initialDelay = 200_000) // 30 Minutes = 1,800,000 Milliseconds
+    // @Scheduled(cron = "0 0 9 ? * SAT") // running every Saturday at 9 TODO UNCOMMENT
+    @CacheEvict(value = CacheConfiguration.LATEST_DIGESTS_CACHE_KEY, allEntries = true) // Evict all from Latest Digests Cache
     public void createDigest() {
 
         LOG.info("Running Create Digest Scheduled Task");
@@ -80,8 +83,10 @@ public class CreateDigestScheduledTask {
         // Create a digest for the overall top stories for all current users
         storyService.findOverallTopStoriesByCreationDate(DurationType.WEEKLY.getDuration(), N)
                     .stream()
-                    .map(topStory -> digestService.createOverallDigest(topStory, new HashSet<User>(users), DurationType.WEEKLY))
+                    .map(topStory -> digestService.createOverallDigest(topStory, new HashSet<User>(users), DurationType.WEEKLY)) // TODO make this inside the service
                     .forEach(digest -> LOG.info("Created Overall Digest: {}", digest));
+
+
 
         LOG.info("Finished Create Digest Scheduled Task");
     }

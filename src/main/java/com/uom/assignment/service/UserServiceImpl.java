@@ -1,10 +1,15 @@
 package com.uom.assignment.service;
 
+import com.uom.assignment.cache.CacheConfiguration;
 import com.uom.assignment.controller.BusinessError;
 import com.uom.assignment.controller.BusinessErrorException;
 import com.uom.assignment.dao.*;
 import com.uom.assignment.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final TopicService topicService;
@@ -71,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = CacheConfiguration.TOP_STORIES_CACHE_KEY, key = "#id")
     public void update(final Long id, final Set<String> topics) {
 
         final User user = Optional.ofNullable(userRepository.findOne(id))
@@ -98,7 +106,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = CacheConfiguration.TOP_STORIES_CACHE_KEY)
     public Map<Topic, Story> getTopStories(final Long id) {
+
+        LOG.info("Bypassing {} Cache for Key: [{}] ", CacheConfiguration.TOP_STORIES_CACHE_KEY, id);
 
         final User user = Optional.ofNullable(userRepository.findOne(id))
                                   .orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_USER));
@@ -118,5 +129,15 @@ public class UserServiceImpl implements UserService {
 
         return digestService.findDigests(user, start, end);
     }
+
+    @Override
+    public Map<LocalDate, List<Digest>> getLatestDigests(final Long id) {
+
+        final User user = Optional.ofNullable(userRepository.findOne(id))
+                .orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_USER));
+
+        return digestService.findLatestDigests(user);
+    }
+
 }
 

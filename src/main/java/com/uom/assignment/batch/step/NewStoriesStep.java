@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+
 /**
  * The {@link Configuration} for the New Stories Step, which fetches a batch of New Stories from the Hacker News API, transforms the response and subsequently persists it.
  *
@@ -24,8 +26,11 @@ public class NewStoriesStep {
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Value("${batch.new.stories.chunk}")
+    @Value("${batch.step.chunk.size}")
     private int chunk;
+
+    @Value("${batch.step.retry.limit}")
+    private int retry;
 
     @Autowired
     public NewStoriesStep(final StepBuilderFactory stepBuilderFactory) {
@@ -40,6 +45,9 @@ public class NewStoriesStep {
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant()
+                .retry(IOException.class)
+                .retryLimit(retry)
                 .build();
     }
 }

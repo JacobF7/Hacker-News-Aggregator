@@ -24,7 +24,7 @@ public class UpdateTopStoriesStep {
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Value("${batch.update.stories.chunk}")
+    @Value("${batch.step.chunk.size}")
     private int chunk;
 
     @Autowired
@@ -41,8 +41,6 @@ public class UpdateTopStoriesStep {
                 .processor(processor)
                 .writer(writer)
                 .build();
-
-        // TODO ADD ERROR HANDLER
     }
 
 }

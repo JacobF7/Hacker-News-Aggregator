@@ -25,13 +25,13 @@ public class DeleteExpiredSessionsScheduledTaskTest {
     @InjectMocks
     private DeleteExpiredSessionsScheduledTask deleteExpiredSessionsScheduledTask;
 
-    private static final Long DELETED_SESSION_ID = new SecureRandom().nextLong();
+    private static final Long EXPIRED_SESSION_ID = new SecureRandom().nextLong();
 
     @Test
     public void deleteExpiredSessions_delegatesToSessionService() {
 
-        // Mocking a deleted Session
-        Mockito.when(sessionService.deleteExpiredSessions()).thenReturn(Collections.singleton(DELETED_SESSION_ID));
+        // Mocking an expired Session
+        Mockito.when(sessionService.deleteExpiredSessions()).thenReturn(Collections.singleton(EXPIRED_SESSION_ID));
 
         deleteExpiredSessionsScheduledTask.deleteExpiredSessions();
 

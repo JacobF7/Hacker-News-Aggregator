@@ -5,8 +5,10 @@ import com.uom.assignment.dao.Topic;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A service containing all {@link Story} related operations.
@@ -125,4 +127,13 @@ public interface StoryService {
      * @return a {@link List} containing the Top {@code n} Stories.
      */
     List<Story> findTopStoriesByTitleContainingAndCreationDate(String topicName, Duration duration, int n);
+
+    /**
+     * Deletes any unused {@link Story} and where the {@link Duration} between now and {@link Story#creationDate} is longer than the specified {@link Duration}.
+     * Note that a {@link Story} is considered unused if {@link Story#digests} is {@link Collections#emptyList()}.
+     *
+     * @param duration the {@link Duration} of time.
+     * @return a {@link Set} of {@link Story#id} for every unused {@link Story} that is deleted.
+     */
+    Set<Long> deleteUnusedStoriesByCreationDate(Duration duration);
 }

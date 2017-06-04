@@ -32,14 +32,15 @@ public class UpdateTopStoriesProcessor implements ItemProcessor<Topic, TopStoryM
 
     @Override
     public TopStoryModel process(final Topic topic) {
+
         final Story topStory = storyService.findTopStoryByTitleContainingAndCreationDate(topic.getName(), DurationType.DAILY.getDuration()).orElse(null);
 
-        // Update the topStory of a topic if the top story changed
-        if(!Objects.equals(topic.getTopStory(), topStory)) {
-            return new TopStoryModel(topic, topStory);
+        // do NOT Update the topStory of a topic if the top story has NOT changed
+        if(Objects.equals(topic.getTopStory(), topStory)) {
+            LOG.info("Top story for Topic: [{}] has not changed", topic.getName());
+            return null;
         }
 
-        LOG.info("Top story for Topic: [{}] has not changed", topic.getName());
-        return null;
+        return new TopStoryModel(topic, topStory);
     }
 }

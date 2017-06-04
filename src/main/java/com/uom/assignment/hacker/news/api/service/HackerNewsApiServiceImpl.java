@@ -2,10 +2,8 @@ package com.uom.assignment.hacker.news.api.service;
 
 import com.uom.assignment.hacker.news.api.core.ResponseContentType;
 import com.uom.assignment.hacker.news.api.request.HackerNewsRequest;
-import com.uom.assignment.hacker.news.api.request.ItemRequest;
 import com.uom.assignment.hacker.news.api.response.EmptyResponse;
 import com.uom.assignment.hacker.news.api.response.HackerNewsResponse;
-import com.uom.assignment.hacker.news.api.response.ItemResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**

@@ -1,6 +1,7 @@
 package com.uom.assignment.model.response;
 
 import com.uom.assignment.dao.Digest;
+import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
 
 import java.util.List;
@@ -15,19 +16,19 @@ import java.util.stream.Collectors;
  */
 public class UserDigestModel {
 
-    private Map<String, StoryModel> topicDigests;
+    private Map<String, List<StoryModel>> topicDigests;
     private List<StoryModel> overallDigests;
 
-    private UserDigestModel(final Map<String, StoryModel> topicDigests, final List<StoryModel> overallDigests) {
+    private UserDigestModel(final Map<String, List<StoryModel>> topicDigests, final List<StoryModel> overallDigests) {
         this.topicDigests = topicDigests;
         this.overallDigests= overallDigests;
     }
 
-    public Map<String, StoryModel> getTopicDigestModel() {
+    public Map<String, List<StoryModel>> getTopicDigestModel() {
         return topicDigests;
     }
 
-    public void setTopicDigestModel(final Map<String, StoryModel> topicDigests) {
+    public void setTopicDigestModel(final Map<String, List<StoryModel>> topicDigests) {
         this.topicDigests = topicDigests;
     }
 
@@ -62,10 +63,11 @@ public class UserDigestModel {
 
     public static UserDigestModel of(final List<Digest> digests) {
 
-        final Map<String, StoryModel> topicDigests =
-                digests.stream()
-                       .filter(digest -> !digest.getOverall())
-                       .collect(Collectors.toMap(digest -> digest.getTopic().getName(), digest -> StoryModel.of(digest.getStory())));
+        final Map<String, List<StoryModel>> topicDigests = digests.stream()
+                .filter(digest -> !digest.getOverall())
+                .collect(Collectors.groupingBy(digest -> digest.getTopic().getName(),
+                                               Collectors.mapping(digest -> StoryModel.of(digest.getStory()),
+                                                                  Collectors.toList())));
 
         final List<StoryModel> overallDigests =
                 digests.stream()

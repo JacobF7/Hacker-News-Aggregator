@@ -16,7 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * A test suite for {@link TopicService}.
@@ -95,7 +94,7 @@ public class TopicServiceImplTest {
         Mockito.verify(topicRepository, Mockito.never()).save(Mockito.any(Topic.class));
 
         // Verifying that an attempt was NOT made to find the top story for mockTopic
-        Mockito.verify(storyService, Mockito.never()).findTopStoryByTitleContaining(TOPIC_NAME);
+        Mockito.verify(storyService, Mockito.never()).findTopStoryByTitleContainingAndCreationDate(TOPIC_NAME, DurationType.DAILY.getDuration());
 
         // Verifying that the topic was fetched
         Assert.assertEquals(topic, mockTopic);

@@ -6,10 +6,8 @@ import com.uom.assignment.service.StoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Set;
 
@@ -37,7 +35,7 @@ public class DeleteUnusedStoriesScheduledTask {
 
         LOG.info("Running Delete Unused Stories Scheduled Task");
 
-        final Set<Long> deletedDigests = storyService.deleteUnusedStoriesByCreationDate(Duration.ofMinutes(1));
+        final Set<Long> deletedDigests = storyService.deleteUnusedStoriesByCreationDate(DurationType.WEEKLY.getDuration());
 
         deletedDigests.parallelStream().forEach(storyId -> LOG.info("Removing Unused Story [{}]", storyId));
 

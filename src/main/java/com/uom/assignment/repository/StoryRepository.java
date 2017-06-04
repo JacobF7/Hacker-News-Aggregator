@@ -47,14 +47,6 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
     List<Story> findByCreationDateAfter(Long timestamp);
 
     /**
-     * Retrieve any {@link Story} which has the {@link Story#title} containing {@code topicName}.
-     *
-     * @param topicName the name of the {@link Topic}.
-     * @return a {@link List} containing any {@link Story} which has the {@link Story#title} containing {@code topicName}.
-     */
-    List<Story> findByTitleContaining(String topicName);
-
-    /**
      * Retrieve any {@link Story} where {@link Story#creationDate} occurs before the specified {@code timestamp} and {@link Story#digests} is empty.
      *
      * @param timestamp the timestamp before which any returned {@link Story} should have been created.

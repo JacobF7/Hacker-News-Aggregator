@@ -69,14 +69,6 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public Optional<Story> findTopStoryByTitleContaining(final String topicName) {
-        return storyRepository.findByTitleContaining(topicName)
-                              .stream()
-                              .filter(Story::isActive)
-                              .max(Comparator.comparing(Story::getScore));
-    }
-
-    @Override
     public Optional<Story> findTopStoryByTitleContainingAndCreationDate(final String topicName, final Duration duration) {
         return findActiveByCreationDateDuration(duration).stream()
                                                          .filter(Story::isActive)
@@ -95,14 +87,19 @@ public class StoryServiceImpl implements StoryService {
 
         final Set<Story> stories = findActiveByCreationDateDuration(duration).stream()
                 .filter(Story::isActive)
-                .filter(story -> StringUtils.containsIgnoreCase(story.getTitle(), topicName)).collect(Collectors.toSet());
+                .filter(story -> StringUtils.containsIgnoreCase(story.getTitle(), topicName))
+                .collect(Collectors.toSet());
 
         return Ordering.from(Comparator.comparing(Story::getScore)).greatestOf(stories.iterator(), n);
     }
 
     @Override
     public Set<Long> deleteUnusedStoriesByCreationDate(final Duration duration) {
-        final Set<Long> stories = storyRepository.findUnusedByCreationDate(System.currentTimeMillis() - duration.toMillis()).stream().map(Story::getId).collect(Collectors.toSet());
+        final Set<Long> stories =
+                storyRepository.findUnusedByCreationDate(System.currentTimeMillis() - duration.toMillis())
+                               .stream()
+                               .map(Story::getId)
+                               .collect(Collectors.toSet());
 
         stories.forEach(storyRepository::delete);
 

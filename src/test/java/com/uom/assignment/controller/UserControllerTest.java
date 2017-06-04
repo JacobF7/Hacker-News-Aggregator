@@ -220,71 +220,6 @@ public class UserControllerTest {
     }
 
     @Test(expected = BusinessErrorException.class)
-    public void getRealTimeStories_userIdDoesNotMatchToken_throwsException() {
-
-        // Mocking that the request contains USER_ID
-        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
-
-        final Long differentUserId = USER_ID + 1;
-
-        userController.getRealTimeTopStories(mockRequest, differentUserId);
-    }
-
-    @Test
-    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_topStoryFound_returnsTopStoriesModel() {
-
-        // Mocking that the request contains USER_ID
-        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
-
-        // Mocking that mockStory is the top story for mockTopic
-        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, mockStory));
-
-        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(mockRequest, USER_ID);
-
-        // Verifying that getRealTimeTopStories was attempted
-        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
-
-        // Verifying that mockStory is the top story for mockTopic
-        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, mockStory)), response.getBody());
-    }
-
-    @Test
-    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_topStoryNotFound_returnsTopStoriesModel() {
-
-        // Mocking that the request contains USER_ID
-        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
-
-        // Mocking that null is the top story for mockTopic
-        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, null));
-
-        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(mockRequest, USER_ID);
-
-        // Verifying that getRealTimeTopStories was attempted
-        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
-
-        // Verifying that mockTopic has no top story
-        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, null)), response.getBody());
-    }
-
-    @Test
-    public void getRealTimeStories_userIdMatchesToken_delegateToUserService_noUserTopic_returnsTopStoriesModel() {
-
-        // Mocking that the request contains USER_ID
-        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
-
-        // Mocking that no top stories are returned
-        Mockito.when(userService.getRealTimeTopStories(USER_ID)).thenReturn(Collections.emptyMap());
-
-        final ResponseEntity<TopStoriesModel> response = userController.getRealTimeTopStories(mockRequest, USER_ID);
-
-        // Verifying that getRealTimeTopStories was attempted
-        Mockito.verify(userService).getRealTimeTopStories(USER_ID);
-
-        // Verifying that no top stories are returned
-        Assert.assertEquals(new TopStoriesModel(Collections.emptyMap()), response.getBody());
-    }
-
-    @Test(expected = BusinessErrorException.class)
     public void getTopStories_userIdDoesNotMatchToken_throwsException() {
 
         // Mocking that the request contains USER_ID
@@ -311,6 +246,42 @@ public class UserControllerTest {
 
         // Verifying that mockStory is the top story for mockTopic
         Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, mockStory)), response.getBody());
+    }
+
+    @Test
+    public void getTopStories_userIdMatchesToken_delegateToUserService_topStoryNotFound_returnsTopStoriesModel() {
+
+        // Mocking that the request contains USER_ID
+        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
+
+        // Mocking that null is the top story for mockTopic
+        Mockito.when(userService.getTopStories(USER_ID)).thenReturn(Collections.singletonMap(mockTopic, null));
+
+        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(mockRequest, USER_ID);
+
+        // Verifying that getTopStories was attempted
+        Mockito.verify(userService).getTopStories(USER_ID);
+
+        // Verifying that mockTopic has no top story
+        Assert.assertEquals(new TopStoriesModel(Collections.singletonMap(mockTopic, null)), response.getBody());
+    }
+
+    @Test
+    public void getTopStories_userIdMatchesToken_delegateToUserService_noUserTopic_returnsTopStoriesModel() {
+
+        // Mocking that the request contains USER_ID
+        Mockito.when(mockRequest.getAttribute(AuthorizationHeader.USER_ID)).thenReturn(USER_ID);
+
+        // Mocking that no top stories are returned
+        Mockito.when(userService.getTopStories(USER_ID)).thenReturn(Collections.emptyMap());
+
+        final ResponseEntity<TopStoriesModel> response = userController.getTopStories(mockRequest, USER_ID);
+
+        // Verifying that getTopStories was attempted
+        Mockito.verify(userService).getTopStories(USER_ID);
+
+        // Verifying that no top stories are returned
+        Assert.assertEquals(new TopStoriesModel(Collections.emptyMap()), response.getBody());
     }
 
     @Test(expected = BusinessErrorException.class)

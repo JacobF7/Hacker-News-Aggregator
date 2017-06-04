@@ -86,16 +86,6 @@ public interface StoryService {
 
     /**
      * Retrieve the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
-     * Note that any {@link Story} that is {@link Story#deleted} is ignored.
-     *
-     * @param topicName the name of the {@link Topic}.
-     * @return the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
-     */
-    @Deprecated // TODO REMOVE
-    Optional<Story> findTopStoryByTitleContaining(String topicName);
-
-    /**
-     * Retrieve the top {@link Story} which has the {@link Story#title} containing {@code topicName}.
      * Note that the {@link Duration} between now and the {@link Story#creationDate} must NOT be longer than the specified {@link Duration}.
      * Note that any {@link Story} that is {@link Story#deleted} is ignored.
      *

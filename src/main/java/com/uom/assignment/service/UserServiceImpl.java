@@ -33,16 +33,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TopicService topicService;
     private final UserTopicService userTopicService;
-    private final StoryService storyService;
     private final DigestService digestService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(final UserRepository userRepository, final TopicService topicService, final UserTopicService userTopicService, final StoryService storyService, final DigestService digestService, final PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserRepository userRepository, final TopicService topicService, final UserTopicService userTopicService, final DigestService digestService, final PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.topicService = topicService;
         this.userTopicService = userTopicService;
-        this.storyService = storyService;
         this.digestService = digestService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -90,19 +88,6 @@ public class UserServiceImpl implements UserService {
 
         // Register the user to the topics
         userTopicService.subscribe(user, topicSet);
-    }
-
-    @Override
-    public Map<Topic, Story> getRealTimeTopStories(final Long id) {
-
-        final User user = Optional.ofNullable(userRepository.findOne(id))
-                .orElseThrow(() -> new BusinessErrorException(BusinessError.INVALID_USER));
-
-        return user.getUserTopics()
-                .stream()
-                .filter(UserTopic::isEffective)
-                .map(UserTopic::getTopic)
-                .collect(HashMap::new, (topStories, topic)-> topStories.put(topic, storyService.findTopStoryByTitleContaining(topic.getName()).orElse(null)), HashMap::putAll);
     }
 
     @Override

@@ -52,7 +52,6 @@ public class UserController {
                                                  @PathVariable final Long id,
                                                  @RequestBody @Valid final TopicModel topicModel) {
 
-
         // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
         if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
             throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
@@ -60,20 +59,6 @@ public class UserController {
 
         userService.update(id, topicModel.getTopics());
         return ResponseEntity.ok(new UserTopicModel(id, topicModel.getTopics()));
-    }
-
-    @RequestMapping(value ="/{id}/real-time-stories", method = RequestMethod.GET)
-    public ResponseEntity<TopStoriesModel> getRealTimeTopStories(@AuthorizationHeader final HttpServletRequest request,
-                                                                 @PathVariable final Long id) {
-
-        // Make sure that the id matches the USER_ID which was set in the request from the Authentication Aspect
-        if(!Objects.equals(id, request.getAttribute(AuthorizationHeader.USER_ID))) {
-            throw new BusinessErrorException(BusinessError.INVALID_TOKEN);
-        }
-
-        final Map<Topic, Story> topStories = userService.getRealTimeTopStories(id);
-        final TopStoriesModel topStoriesModel = new TopStoriesModel(topStories);
-        return ResponseEntity.ok(topStoriesModel);
     }
 
     @RequestMapping(value ="/{id}/stories", method = RequestMethod.GET)

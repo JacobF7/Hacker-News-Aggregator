@@ -14,7 +14,6 @@ import java.util.Set;
  */
 public interface UserTopicService {
 
-    // TODO TRANSACTION SCOPE
     /**
      * Subscribe a {@link User} to a {@link Set} of {@link Topic}s.
      * Note that this action may unsubscribe the {@link User} from any previously subscribed {@link Topic}s.

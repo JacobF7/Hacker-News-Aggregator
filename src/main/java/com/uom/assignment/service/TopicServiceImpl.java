@@ -1,6 +1,5 @@
 package com.uom.assignment.service;
 
-import com.sun.org.apache.regexp.internal.RE;
 import com.uom.assignment.cache.CacheConfiguration;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
@@ -42,6 +41,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Cacheable(value = CacheConfiguration.TOPICS_CACHE_KEY, key = "T(com.uom.assignment.service.TopicService).sanitize(#topic)")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Topic create(final String topic) {
 

@@ -10,12 +10,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableWebMvc
 @EnableScheduling
 @EnableCaching
 @EnableBatchProcessing
+@EnableSwagger2
 @Configuration
 public class Application {
 
@@ -27,5 +29,4 @@ public class Application {
 	public PasswordEncoder configurePasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }

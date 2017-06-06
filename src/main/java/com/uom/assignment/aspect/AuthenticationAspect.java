@@ -1,6 +1,7 @@
 package com.uom.assignment.aspect;
 
 import com.uom.assignment.dao.Session;
+import com.uom.assignment.dao.User;
 import com.uom.assignment.service.SessionService;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -36,7 +37,7 @@ public class AuthenticationAspect {
 
     /**
      * The {@link Before} advice serving to authenticate any protected API.
-     * If the Authorization Token Header is valid, the associated {@link Session} is refreshed and the .
+     * If the Authorization Token Header is valid, the associated {@link Session} is refreshed and the {@link User#id} for the associated {@link Session} is set within the {@link HttpServletRequest}.
      *
      * @param request the {@link HttpServletRequest} containing the Authorization Token Header annotated by the {@link AuthorizationHeader} annotation.
      */

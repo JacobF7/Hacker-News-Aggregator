@@ -127,8 +127,8 @@ public class Digest {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
-                .add("topic", topic)
-                .add("story", story)
+                .add("topic", topic.getName())
+                .add("story", story.getTitle())
                 .add("creationDate", creationDate)
                 .add("overall", overall)
                 .add("users", users.stream().map(User::getId).collect(Collectors.toSet()))

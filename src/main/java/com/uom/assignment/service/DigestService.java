@@ -6,7 +6,6 @@ import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +79,7 @@ public interface DigestService {
      * @return true if the given {@link Digest} is expired, false otherwise.
      */
     static boolean isDigestExpired(Digest digest) {
-        return Period.between(toLocalDate(digest.getCreationDate()), toLocalDate(Instant.now().truncatedTo(ChronoUnit.DAYS).toEpochMilli())).getYears() >= getDigestExpiryTime().getYears();
+        return Period.between(toLocalDate(digest.getCreationDate()), LocalDate.now().atStartOfDay(ZoneOffset.UTC).toLocalDate()).getYears() >= getDigestExpiryTime().getYears();
     }
 
     /**

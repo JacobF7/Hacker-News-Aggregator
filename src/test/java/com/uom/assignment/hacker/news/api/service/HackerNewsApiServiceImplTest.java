@@ -32,6 +32,9 @@ public class HackerNewsApiServiceImplTest {
 
         Assert.assertNotNull(hackerNewsResponse);
         Assert.assertEquals(NewStoriesResponse.class, hackerNewsResponse.getClass());
+
+        final NewStoriesResponse newStoriesResponse = (NewStoriesResponse) hackerNewsResponse;
+        Assert.assertNotNull(newStoriesResponse.getItems());
     }
 
     @Test
@@ -40,6 +43,15 @@ public class HackerNewsApiServiceImplTest {
 
         Assert.assertNotNull(hackerNewsResponse);
         Assert.assertEquals(ItemResponse.class, hackerNewsResponse.getClass());
+
+        final ItemResponse newStoriesResponse = (ItemResponse) hackerNewsResponse;
+        Assert.assertNotNull(newStoriesResponse.getId());
+        Assert.assertNotNull(newStoriesResponse.getBy());
+        Assert.assertNotNull(newStoriesResponse.getScore());
+        Assert.assertNotNull(newStoriesResponse.getTime());
+        Assert.assertNotNull(newStoriesResponse.getTitle());
+        Assert.assertNotNull(newStoriesResponse.getType());
+        Assert.assertNotNull(newStoriesResponse.getUrl());
     }
 
     @Test

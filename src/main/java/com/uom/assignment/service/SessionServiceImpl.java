@@ -105,6 +105,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void refresh(final Session session) {
         session.setLastActivity(System.currentTimeMillis());
+        sessionRepository.save(session);
     }
 
     @Override

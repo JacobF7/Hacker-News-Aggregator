@@ -73,7 +73,12 @@ public class SessionServiceImplTest {
     @Test
     public void refresh_sessionTokenRefreshed() {
         sessionService.refresh(mockSession);
+
+        // Verifying that the session was refreshed
         Mockito.verify(mockSession).setLastActivity(Matchers.anyLong());
+
+        // Verifying that the refreshed session was saved
+        Mockito.verify(sessionRepository).save(mockSession);
     }
 
     @Test
@@ -147,7 +152,7 @@ public class SessionServiceImplTest {
         Mockito.when(passwordEncoder.matches(password, mockUser.getPassword())).thenReturn(true);
 
         // A session, i.e. mockSession, exists for this mockUser (see Setup)
-        // Mock lastActivity as now for thi, i.e. mockSession is not expired.
+        // Mock lastActivity as now, i.e. mockSession is not expired.
         Mockito.when(mockSession.getLastActivity()).thenReturn(System.currentTimeMillis());
 
         final String token = sessionService.login(username, password);
@@ -155,8 +160,11 @@ public class SessionServiceImplTest {
         // Assert that the token is equal to the token for mockSession
         Assert.assertEquals(mockSession.getToken(), token);
 
-        // Verifying that a new Session was not created
-        Mockito.verify(sessionRepository, Mockito.never()).save(Matchers.any(Session.class));
+        // Verifying that the session was refreshed
+        Mockito.verify(mockSession).setLastActivity(Matchers.anyLong());
+
+        // Verifying that the refreshed session was saved
+        Mockito.verify(sessionRepository).save(mockSession);
     }
 
     @Test
@@ -215,6 +223,9 @@ public class SessionServiceImplTest {
 
         // Verifying Session is refreshed
         Mockito.verify(mockSession).setLastActivity(Matchers.anyLong());
+
+        // Verifying that the refreshed session was saved
+        Mockito.verify(sessionRepository).save(mockSession);
 
         // Verifying that USER_ID is returned
         Assert.assertEquals(USER_ID, userId);

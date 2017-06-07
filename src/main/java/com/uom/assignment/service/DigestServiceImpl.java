@@ -37,11 +37,13 @@ public class DigestServiceImpl implements DigestService {
         this.digestRepository = digestRepository;
     }
 
+    @Override
     public Digest createTopicDigest(final Topic topic, final Story topStory, final Set<User> users, final DurationType durationType) {
         final Instant now = Instant.now().truncatedTo(ChronoUnit.DAYS);
         return digestRepository.save(new Digest(topic, topStory, now.toEpochMilli(), users,false));
     }
 
+    @Override
     public Digest createOverallDigest(final Story overallTopStory, final Set<User> users, final DurationType durationType) {
         final Instant now = Instant.now().truncatedTo(ChronoUnit.DAYS);
         return digestRepository.save(new Digest(null, overallTopStory, now.toEpochMilli(), users, true));

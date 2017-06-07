@@ -66,7 +66,7 @@ public interface SessionService {
      * @param token the {@link Session#token} of the desired {@link Session}.
      * @return an {@link Optional} containing the {@link Session} if a {@link Session} exists with the given {@code token}, otherwise {@link Optional#empty()}.
      */
-    Optional<Session> findByToken(String token); // TODO CACHE THIS
+    Optional<Session> findByToken(String token);
 
     /**
      * Refreshes the given {@link Session} by setting {@link Session#lastActivity} to {@link System#currentTimeMillis()}.

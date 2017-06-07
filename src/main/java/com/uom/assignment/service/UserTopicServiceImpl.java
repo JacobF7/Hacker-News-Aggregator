@@ -5,6 +5,7 @@ import com.uom.assignment.dao.User;
 import com.uom.assignment.dao.UserTopic;
 import com.uom.assignment.repository.UserTopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,8 @@ public class UserTopicServiceImpl implements UserTopicService {
         this.userTopicRepository = userTopicRepository;
     }
 
-    @Override //TODO ASYNC
+    @Override
+    @Async // TODO VERIFY THIS ASYNC
     public void subscribe(final User user, final Set<Topic> topics) {
 
         // unsubscribe the user from any topic that is no longer effective

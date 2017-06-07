@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Cacheable(value = CacheConfiguration.TOPICS_CACHE_KEY, key = "T(com.uom.assignment.service.TopicService).sanitize(#topic)")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_UNCOMMITTED) // Using this isolation level in the case that a topic is about to be created with the same topic name
     @Override
     public Topic create(final String topic) {
 

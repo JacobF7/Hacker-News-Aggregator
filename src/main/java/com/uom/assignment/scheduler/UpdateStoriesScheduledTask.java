@@ -29,6 +29,7 @@ public class UpdateStoriesScheduledTask {
     private static final Logger LOG = LoggerFactory.getLogger(UpdateStoriesScheduledTask.class);
     private static final String START_TIME = "START_TIME";
 
+    private final Object lock = new Object();
     private final JobLauncher jobLauncher;
     private final Job job;
 
@@ -38,7 +39,7 @@ public class UpdateStoriesScheduledTask {
         this.job = job;
     }
 
-    //@Scheduled(fixedDelay = 1_800_000, initialDelay = 100000)
+    //@Scheduled(fixedDelay = 1_800_000, initialDelay = 100_000)
     //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight TODO UNCOMMENT
     @CacheEvict(value = {CacheConfiguration.TOP_STORIES_CACHE_KEY, CacheConfiguration.TOPICS_CACHE_KEY}, allEntries = true)
     public void updateAllStories() {
@@ -52,15 +53,21 @@ public class UpdateStoriesScheduledTask {
     }
 
     private void updateStories(final FetchMode fetchMode) {
-        LOG.info("Running [{}] Update Stories Scheduled Task", fetchMode);
 
-        try {
-            jobLauncher.run(job, new JobParameters(ImmutableMap.of(START_TIME, new JobParameter(System.currentTimeMillis()), FetchMode.FETCH_MODE, new JobParameter(fetchMode.name()))));
-        } catch (final Exception e) {
-            LOG.error(String.format("Encountered Error during [%s] Update Stories Scheduled Task", fetchMode), e);
-        }
+        synchronized (lock) {
 
-        LOG.info("Finished [{}] Update Stories Scheduled Task", fetchMode);
+             LOG.info("Running [{}] Update Stories Scheduled Task", fetchMode);
+
+             try {
+                 jobLauncher.run(job, new JobParameters(ImmutableMap.of(START_TIME, new JobParameter(System.currentTimeMillis()), FetchMode.FETCH_MODE, new JobParameter(fetchMode.name()))));
+             } catch (final Exception e) {
+                 LOG.error(String.format("Encountered Error during [%s] Update Stories Scheduled Task", fetchMode), e);
+             } finally {
+                 lock.notify();
+             }
+
+             LOG.info("Finished [{}] Update Stories Scheduled Task", fetchMode);
+         }
     }
 
 }

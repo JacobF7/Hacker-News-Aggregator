@@ -83,7 +83,7 @@ public class CreateDigestScheduledTask {
         // Create a digest for the overall top stories for all current users
         storyService.findOverallTopStoriesByCreationDate(DurationType.WEEKLY.getDuration(), N)
                     .stream()
-                    .map(topStory -> digestService.createOverallDigest(topStory, new HashSet<User>(users), DurationType.WEEKLY)) // TODO make this inside the service
+                    .map(topStory -> digestService.createOverallDigest(topStory, new HashSet<User>(users), DurationType.WEEKLY))
                     .forEach(digest -> LOG.info("Created Overall Digest: {}", digest));
 
 

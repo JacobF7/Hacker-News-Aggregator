@@ -30,7 +30,7 @@ public class UpdateStoriesReader implements ItemReader<Story> {
     @Autowired
     public UpdateStoriesReader(final StoryService storyService,
                                @Value("#{jobParameters[T(com.uom.assignment.batch.reader.FetchMode).FETCH_MODE]}") final FetchMode fetchMode,
-                               @Value("${story.recent.duration.hours}") int duration) {
+                               @Value("${story.recent.duration.hours}") final int duration) {
 
         LOG.info("Reading [{}] Stories from Database", fetchMode);
 

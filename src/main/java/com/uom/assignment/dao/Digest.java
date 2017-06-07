@@ -127,7 +127,7 @@ public class Digest {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
-                .add("topic", topic.getName())
+                .add("topic", topic == null ? null : topic.getName())
                 .add("story", story.getTitle())
                 .add("creationDate", creationDate)
                 .add("overall", overall)

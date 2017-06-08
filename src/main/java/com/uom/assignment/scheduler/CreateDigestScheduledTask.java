@@ -57,8 +57,7 @@ public class CreateDigestScheduledTask {
         this.job = job;
     }
 
-    // @Scheduled(fixedDelay = 1_800_000, initialDelay = 200_000) // 30 Minutes = 1,800,000 Milliseconds
-    // @Scheduled(cron = "0 0 9 ? * SAT") // running every Saturday at 9 TODO UNCOMMENT
+    @Scheduled(cron = "0 0 9 ? * SAT") // runs every Saturday at 9
     @CacheEvict(value = CacheConfiguration.LATEST_DIGESTS_CACHE_KEY, allEntries = true) // Evict all from Latest Digests Cache
     public void createDigest() {
 

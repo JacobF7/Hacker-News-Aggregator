@@ -6,6 +6,7 @@ import com.uom.assignment.service.StoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -29,8 +30,7 @@ public class DeleteUnusedStoriesScheduledTask {
         this.storyService = storyService;
     }
 
-   // @Scheduled(cron = "0 0 9 ? * SAT") // running every Saturday at 9 // TODO UNCOMMENT
-   // @Scheduled(fixedDelay = 1_800_000)
+    @Scheduled(cron = "0 0 9 ? * SAT") // runs every Saturday at 9
     public void deleteUnusedStories() {
 
         LOG.info("Running Delete Unused Stories Scheduled Task");

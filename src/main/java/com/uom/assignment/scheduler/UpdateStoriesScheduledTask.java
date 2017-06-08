@@ -39,14 +39,13 @@ public class UpdateStoriesScheduledTask {
         this.job = job;
     }
 
-    //@Scheduled(fixedDelay = 1_800_000, initialDelay = 100_000)
-    //@Scheduled(cron = "0 0 0 * * ?") // runs everyday at midnight TODO UNCOMMENT
+    @Scheduled(cron = "0 0 3 * * ?") // runs everyday at 3:00 AM
     @CacheEvict(value = {CacheConfiguration.TOP_STORIES_CACHE_KEY, CacheConfiguration.TOPICS_CACHE_KEY}, allEntries = true)
     public void updateAllStories() {
         updateStories(FetchMode.ALL);
     }
 
-   // @Scheduled(fixedDelay = 3_600_000, initialDelay = 100_000) // 1 Hour = 3,600,000 Milliseconds TODO UNCOMMENT
+    @Scheduled(fixedDelay = 3_600_000) // runs every hour = 3,600,000 Milliseconds
     @CacheEvict(value = {CacheConfiguration.TOP_STORIES_CACHE_KEY, CacheConfiguration.TOPICS_CACHE_KEY}, allEntries = true)
     public void updateRecentStories() {
         updateStories(FetchMode.RECENT);

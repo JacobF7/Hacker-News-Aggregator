@@ -28,7 +28,7 @@ public class UserTopicServiceImpl implements UserTopicService {
     }
 
     @Override
-    @Async // TODO VERIFY THIS ASYNC
+    @Async
     public void subscribe(final User user, final Set<Topic> topics) {
 
         // unsubscribe the user from any topic that is no longer effective

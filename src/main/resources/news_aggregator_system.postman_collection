@@ -1,0 +1,215 @@
+{
+	"variables": [],
+	"info": {
+		"name": "News Aggregator System",
+		"_postman_id": "fcb4c23f-a39a-63c7-7b45-f3b1ba97588b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/sessions",
+			"description": "Session Operations",
+			"item": [
+				{
+					"name": "localhost:8080/sessions",
+					"request": {
+						"url": "localhost:8080/sessions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"User\",\n\t\"password\": \"Password\"\n}"
+						},
+						"description": "Login"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:8080/sessions",
+					"request": {
+						"url": "localhost:8080/sessions",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "authorizationToken",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Logout"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/users",
+			"description": "User Operations",
+			"item": [
+				{
+					"name": "localhost:8080/users",
+					"request": {
+						"url": "localhost:8080/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"User\",\n\t\"password\": \"Password\",\n\t\"topics\": [\"Topic\", \"Subject\"]\n}"
+						},
+						"description": "Create User"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:8080/users/{id}",
+					"request": {
+						"url": "localhost:8080/users/{id}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "authorizationHeader",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"topics\": [\"Topic\", \"Subject\"]\n}"
+						},
+						"description": "Update User"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:8080/users/{id}/digests/latest",
+					"request": {
+						"url": "localhost:8080/users/{id}/digests/latest",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "authorizationToken",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Latest Digests"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:8080/users/{id}/digests?start=2017-06-01&end=2017-06-14",
+					"request": {
+						"url": {
+							"raw": "localhost:8080/users/{id}/digests?start=2017-06-01&end=2017-06-14",
+							"auth": {},
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"{id}",
+								"digests"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2017-06-01",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "end",
+									"value": "2017-06-14",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "authorizationToken",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Digests"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:8080/users/{id}/stories",
+					"request": {
+						"url": "localhost:8080/users/{id}/stories",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "authorizationToken",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Top Daily Stories"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

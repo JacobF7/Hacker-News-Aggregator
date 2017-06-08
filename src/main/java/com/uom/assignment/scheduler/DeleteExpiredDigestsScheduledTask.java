@@ -27,7 +27,7 @@ public class DeleteExpiredDigestsScheduledTask {
         this.digestService = digestService;
     }
 
-//    @Scheduled(cron = "0 0 9 ? * SAT") // running every Saturday at 9
+//    @Scheduled(cron = "0 0 9 ? * SAT") // running every Saturday at 9 TODO UNCOMMENT
     public void deleteExpiredDigests() {
 
         LOG.info("Running Delete Expired Digests Scheduled Task");

@@ -28,7 +28,7 @@ public class DeleteExpiredSessionsScheduledTask {
         this.sessionService = sessionService;
     }
 
-   // @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds
+   // @Scheduled(fixedDelay = 1_800_000) // 30 Minutes = 1,800,000 Milliseconds TODO UNCOMMENT
     public void deleteExpiredSessions() {
 
         LOG.info("Running Delete Expired Sessions Scheduled Task");

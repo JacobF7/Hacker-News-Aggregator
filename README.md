@@ -32,6 +32,8 @@ _scheduler_: The functionality and configuration for Scheduled Tasks.
 
 _service_: The business logic of the application.
 
+_resources_: Contains `application.properties` and `init.sql`.
+
 **API**
 
 The API can be viewed and executed by starting the server and:

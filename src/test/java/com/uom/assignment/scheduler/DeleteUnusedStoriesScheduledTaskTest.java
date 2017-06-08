@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import java.util.Collections;
 
 /**
- * A test suite {@link DeleteExpiredSessionsScheduledTask}.
+ * A test suite {@link DeleteUnusedStoriesScheduledTask}.
  *
  * Created by jacobfalzon on 02/06/2017.
  */

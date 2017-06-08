@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 import java.util.Collections;
 
 /**
- * A test suite for {@link DeleteExpiredSessionsScheduledTask}.
+ * A test suite for {@link DeleteExpiredDigestsScheduledTask}.
  *
  * Created by jacobfalzon on 02/06/2017.
  */

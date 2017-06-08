@@ -14,6 +14,19 @@ CREATE TABLE session (
   FOREIGN KEY user_fk (user_id) REFERENCES user(id)
 ) ENGINE = InnoDB;
 
+CREATE TABLE story (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `hacker_news_id` BIGINT(22) NOT NULL UNIQUE,
+  `title` VARCHAR(255) NOT NULL,
+  `author` VARCHAR(255) NOT NULL,
+  `url` VARCHAR(511) NOT NULL,
+  `score` INT(11) NOT NULL,
+  `deleted` BOOLEAN NOT NULL,
+  `last_updated` BIGINT(22) NOT NULL,
+  `creation_date` BIGINT(22) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE topic (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL UNIQUE,
@@ -31,19 +44,6 @@ CREATE TABLE user_topic (
   PRIMARY KEY (`id`),
   FOREIGN KEY user_fk (user_id) REFERENCES user(id) ON UPDATE CASCADE,
   FOREIGN KEY topic_fk (topic_id) REFERENCES topic(id) ON UPDATE CASCADE
-) ENGINE=InnoDB;
-
-CREATE TABLE story (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `hacker_news_id` BIGINT(22) NOT NULL UNIQUE,
-  `title` VARCHAR(255) NOT NULL,
-  `author` VARCHAR(255) NOT NULL,
-  `url` VARCHAR(511) NOT NULL,
-  `score` INT(11) NOT NULL,
-  `deleted` BOOLEAN NOT NULL,
-  `last_updated` BIGINT(22) NOT NULL,
-  `creation_date` BIGINT(22) NOT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE digest (

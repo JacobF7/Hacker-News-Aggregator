@@ -31,3 +31,13 @@ _repository_: The persistence layer serving to perform CRUD operations on Entiti
 _scheduler_: The functionality and configuration for Scheduled Tasks.
 
 _service_: The business logic of the application.
+
+**API**
+
+The API can be viewed and executed by starting the server and:
+ 
+a) Importing the Postman Collection found in:
+`/.../spring.assignment/src/main/resources/news_aggregator_system.postman_collection`
+
+b) Viewing the API using Swagger:
+`http://localhost:8080/swagger-ui.html`

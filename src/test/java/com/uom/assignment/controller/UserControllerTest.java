@@ -13,6 +13,7 @@ import com.uom.assignment.model.response.UserDigestsModel;
 import com.uom.assignment.model.response.UserTopicModel;
 import com.uom.assignment.service.TopicService;
 import com.uom.assignment.service.UserService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -165,7 +166,6 @@ public class UserControllerTest {
         Mockito.when(mockSecondWeekSecondTopicTopStory.getScore()).thenReturn(SECOND_WEEK_TOPIC_SECOND_TOP_STORY_SCORE);
     }
 
-
     @Test
     public void create_delegateToUserService_returnsUserTopicModel() {
 
@@ -174,7 +174,7 @@ public class UserControllerTest {
         final UserModel userModel = new UserModel(username, password, TOPICS);
 
         // Mocking that the create was successful and USER_ID was returned
-        Mockito.when(userService.create(userModel.getUsername(), userModel.getPassword(), userModel.getTopics())).thenReturn(USER_ID);
+        Mockito.when(userService.create(userModel.getUsername(), userModel.getPassword(), userModel.getTopics())).thenReturn(Pair.of(USER_ID, TOPICS));
 
         final ResponseEntity<UserTopicModel> response = userController.create(userModel);
 

@@ -3,6 +3,7 @@ package com.uom.assignment.service;
 import com.uom.assignment.controller.BusinessErrorException;
 import com.uom.assignment.dao.*;
 import com.uom.assignment.repository.UserRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,7 +97,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void create_createsNewUser() {
+    public void create_topicsSuccessfullyCreated_createsNewUser() {
 
         final Set<String> topics = Collections.singleton(TOPIC);
 
@@ -106,7 +107,10 @@ public class UserServiceImplTest {
         // Mocking that TOPIC was created/fetched
         Mockito.when(topicService.create(TOPIC)).thenReturn(mockTopic);
 
-        userService.create(USERNAME, PASSWORD, topics);
+        // Mocking that TOPIC name is TOPIC
+        Mockito.when(mockTopic.getName()).thenReturn(TOPIC);
+
+        final Pair<Long, Set<String>> user = userService.create(USERNAME, PASSWORD, topics);
 
         // Verifying that the PASSWORD was encoded before the User is saved
         Mockito.verify(passwordEncoder).encode(PASSWORD);
@@ -116,6 +120,35 @@ public class UserServiceImplTest {
 
         // Verifying that the new User was subscribed to the set of desired topics
         Mockito.verify(userTopicService).subscribe(Matchers.any(User.class), Matchers.eq(Collections.singleton(mockTopic)));
+
+        // Verifying that the new user was subscribed to TOPIC
+        Assert.assertEquals(Collections.singleton(TOPIC), user.getValue());
+    }
+
+    @Test
+    public void create_topicsNotSuccessfullyCreated_createsNewUser() {
+
+        final Set<String> topics = Collections.singleton(TOPIC);
+
+        // Mocking that no other User exists with this USERNAME
+        Mockito.when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.empty());
+
+        // Mocking that TOPIC could not be created/fetched
+        Mockito.when(topicService.create(TOPIC)).thenThrow(new RuntimeException());
+
+        final Pair<Long, Set<String>> user = userService.create(USERNAME, PASSWORD, topics);
+
+        // Verifying that the PASSWORD was encoded before the User is saved
+        Mockito.verify(passwordEncoder).encode(PASSWORD);
+
+        // Verifying that a new User is created
+        Mockito.verify(userRepository).save(Matchers.any(User.class));
+
+        // Verifying that the new User was NOT subscribed to any topic
+        Mockito.verify(userTopicService, Mockito.never()).subscribe(Matchers.any(User.class), Matchers.anySetOf(Topic.class));
+
+        // Verifying that the new user was NOT subscribed to any topic
+        Assert.assertEquals(Collections.emptySet(), user.getValue());
     }
 
     @Test(expected = BusinessErrorException.class)

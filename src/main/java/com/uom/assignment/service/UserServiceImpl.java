@@ -5,6 +5,7 @@ import com.uom.assignment.controller.BusinessError;
 import com.uom.assignment.controller.BusinessErrorException;
 import com.uom.assignment.dao.*;
 import com.uom.assignment.repository.UserRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(isolation = Isolation.READ_UNCOMMITTED) // Using this isolation level in the case that a user is about to be created with the same username
-    public Long create(final String username, final String password, final Set<String> topics) {
+    public Pair<Long, Set<String>> create(final String username, final String password, final Set<String> topics) {
 
         if(findByUsername(username).isPresent()) {
             throw new BusinessErrorException(String.format("Username [%s] is not unique", username), HttpStatus.CONFLICT);
@@ -62,14 +63,20 @@ public class UserServiceImpl implements UserService {
         final User user = new User(username, passwordEncoder.encode(password));
         userRepository.save(user);
 
-        // If a topic already exists, fetch it, otherwise create a new one.
-        // Note that topics are trimmed and converted to lowercase.
-        final Set<Topic> topicSet = topics.stream().map(topicService::create).collect(Collectors.toSet());
+        final Set<Topic> topicSet;
+
+        try {
+            // If a topic already exists, fetch it, otherwise create a new one.
+            topicSet = topics.stream().map(topicService::create).collect(Collectors.toSet());
+        } catch (final RuntimeException exception) {
+            LOG.info("Failed to create Topics for User {}", user.getId());
+            return Pair.of(user.getId(), Collections.emptySet()); // partial failure: i.e. could not register topics
+        }
 
         // Register the user to the topics
         userTopicService.subscribe(user, topicSet);
 
-        return user.getId();
+        return Pair.of(user.getId(), topicSet.stream().map(Topic::getName).collect(Collectors.toSet()));
     }
 
     @Override

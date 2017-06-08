@@ -12,6 +12,7 @@ import com.uom.assignment.model.response.TopStoriesModel;
 import com.uom.assignment.model.response.UserDigestsModel;
 import com.uom.assignment.model.response.UserTopicModel;
 import com.uom.assignment.service.UserService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Defines CRUD operations for a {@link User}.
@@ -42,9 +44,9 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserTopicModel> create(@RequestBody @Valid final UserModel user) {
-        final Long userId = userService.create(user.getUsername(), user.getPassword(), user.getTopics());
-        return ResponseEntity.ok(new UserTopicModel(userId, user.getTopics()));
+    public ResponseEntity<UserTopicModel> create(@RequestBody @Valid final UserModel userModel) {
+        final Pair<Long, Set<String>> user = userService.create(userModel.getUsername(), userModel.getPassword(), userModel.getTopics());
+        return ResponseEntity.ok(new UserTopicModel(user.getKey(), user.getValue()));
     }
 
     @RequestMapping(value ="/{id}", method = RequestMethod.PATCH)

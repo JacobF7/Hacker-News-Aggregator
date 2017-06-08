@@ -5,6 +5,7 @@ import com.uom.assignment.dao.Digest;
 import com.uom.assignment.dao.Story;
 import com.uom.assignment.dao.Topic;
 import com.uom.assignment.dao.User;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,15 +25,15 @@ public interface UserService {
     List<User> findAll();
 
     /**
-     * Creates a new {@link User} with the specified {@code username} and {@code password}.
+     * Creates a new {@link User} with the specified {@code username}, {@code password} and {@code topics}.
      *
      * @param username the {@link User#username} for the new {@link User}.
      * @param password the {@link User#password} for the new {@link User}.
      * @param topics the {@link Set} of {@link Topic}s which the new {@link User} wishes to subscribe to.
-     * @return the {@link User#id} of the new {@link User}.
+     * @return a {@link Pair} containing the {@link User#id} and {@link Topic#name}s of the new {@link User}.
      * @throws BusinessErrorException when the specified {@code username} already exists.
      */
-    Long create(String username, String password, Set<String> topics);
+    Pair<Long, Set<String>> create(String username, String password, Set<String> topics);
 
     /**
      * Find a {@link User} with the given {@code username}.

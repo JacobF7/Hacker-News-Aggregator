@@ -52,6 +52,7 @@ public class UserTopicTest {
         Assert.assertEquals(mockTopic, userTopic.getTopic());
         Assert.assertEquals(EFFECTIVE_FROM, userTopic.getEffectiveFrom());
         Assert.assertEquals(EFFECTIVE_TO, userTopic.getEffectiveTo());
+        Assert.assertFalse(userTopic.isEffective()); // User Topic is not effective as EFFECTIVE_TO is not null
     }
 
     @Test
@@ -67,6 +68,7 @@ public class UserTopicTest {
         Assert.assertEquals(mockNewTopic, userTopic.getTopic());
         Assert.assertEquals(NEW_EFFECTIVE_FROM, userTopic.getEffectiveFrom());
         Assert.assertEquals(NEW_EFFECTIVE_TO, userTopic.getEffectiveTo());
+        Assert.assertFalse(userTopic.isEffective()); // User Topic is not effective as EFFECTIVE_TO is not null
     }
 
     @Test

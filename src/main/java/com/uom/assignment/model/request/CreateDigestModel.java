@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * A model containing the top {@link Story} for a {@link Set} of {@link User}s subscribed to a particular {@link Topic}.
+ *
  * Created by jacobfalzon on 31/05/2017.
  */
 public class CreateDigestModel {

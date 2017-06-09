@@ -49,6 +49,6 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
      * @param timestamp the timestamp before which any returned {@link Story} should have been created.
      * @return a {@link List} containing every {@link Story} where {@link Story#creationDate} occurs before the specified {@code timestamp} and {@link Story#digests} is empty.
      */
-    @Query("select s from Story s where s.creationDate < :timestamp and s.digests is empty")
-    List<Story> findUnusedByCreationDate(@Param("timestamp") final Long timestamp);
+    @Query("select s from Story s where s.creationDate < ?1 and s.digests is empty")
+    List<Story> findUnusedByCreationDate(Long timestamp);
 }

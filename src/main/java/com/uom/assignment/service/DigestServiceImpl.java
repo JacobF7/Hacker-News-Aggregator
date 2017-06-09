@@ -86,15 +86,19 @@ public class DigestServiceImpl implements DigestService {
     @Override
     public Set<Long> deleteExpiredDigests() {
 
-        final Set<Long> expiredDigests = digestRepository.findAll()
+        final Set<Digest> expiredDigests = digestRepository.findAll()
                 .parallelStream()
                 .filter(DigestService::isDigestExpired)
-                .map(Digest::getId)
                 .collect(Collectors.toSet());
 
-        expiredDigests.forEach(digestRepository::delete);
+        // Remove any User Digest Mappings
+        expiredDigests.forEach(digest -> digest.setUsers(Collections.emptySet()));
 
-        return expiredDigests;
+        final Set<Long> expiredDigestIds = expiredDigests.stream().map(digestRepository::save).map(Digest::getId).collect(Collectors.toSet());
+
+        expiredDigestIds.forEach(digestRepository::delete);
+
+        return expiredDigestIds;
     }
 
 }

@@ -12,8 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.time.*;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.*;
 
 /**
@@ -207,7 +207,16 @@ public class DigestServiceImplTest {
         // Mock creationDate as 1 year ago, i.e. mockDigest is expired.
         Mockito.when(mockDigest.getCreationDate()).thenReturn(getExpiredCreationDate());
 
+        // Mocking that save returns the saved mockDigest
+        Mockito.when(digestRepository.save(mockDigest)).thenReturn(mockDigest);
+
         digestService.deleteExpiredDigests();
+
+        // Verifying that mockDigest was set to have no users associated to it
+        Mockito.verify(mockDigest).setUsers(Collections.emptySet());
+
+        // Verifying that the update was made to the mockDigest
+        Mockito.verify(digestRepository).save(mockDigest);
 
         // Verifying that mockDigest was deleted
         Mockito.verify(digestRepository).delete(mockDigest.getId());
@@ -226,6 +235,12 @@ public class DigestServiceImplTest {
         Mockito.when(mockDigest.getCreationDate()).thenReturn(System.currentTimeMillis());
 
         digestService.deleteExpiredDigests();
+
+        // Verifying that mockDigest was NOT set to have no users associated to it
+        Mockito.verify(mockDigest, Mockito.never()).setUsers(Collections.emptySet());
+
+        // Verifying that NO update was made to the mockDigest
+        Mockito.verify(digestRepository, Mockito.never()).save(mockDigest);
 
         // Verifying that mockDigest was NOT deleted
         Mockito.verify(digestRepository, Mockito.never()).delete(mockDigest.getId());

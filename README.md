@@ -2,7 +2,7 @@
 
 This _Spring Boot_ Application can be launched using Maven by:
 
-_a)_ Navigating to the root directory containing `pom.xml` 
+_a)_ Navigating to the root directory containing `pom.xml`   
 _b)_ Run the following Maven command: `mvn spring-boot:run`
 
 

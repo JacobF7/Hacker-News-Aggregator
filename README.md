@@ -2,8 +2,8 @@
 
 This _Spring Boot_ Application can be launched using Maven by:
 
-_a)_ Navigating to the root directory:  `/.../spring.assignment`  
-_b)_ Run the following command: `mvn spring-boot:run`
+_a)_ Navigating to the root directory containing `pom.xml` 
+_b)_ Run the following Maven command: `mvn spring-boot:run`
 
 
 **Packages**
@@ -39,7 +39,7 @@ _resources_: Contains `application.properties` and `init.sql`.
 The API can be viewed and executed by starting the server and:
  
 a) Importing the Postman Collection found in:
-`/.../spring.assignment/src/main/resources/news_aggregator_system.postman_collection`
+`/.../src/main/resources/news_aggregator_system.postman_collection`
 
 b) Viewing the API using Swagger:
 `http://localhost:8080/swagger-ui.html`
